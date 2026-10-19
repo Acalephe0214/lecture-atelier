@@ -24,6 +24,7 @@ from local_transcription import Jobs, probe
 from local_repair import RepairJobs, resolve_issue
 from core.languages import catalog as language_catalog, language
 from note_jobs import NoteJobs
+from recycle import RecycleBin, RemovalConflict
 from core.word_export import export_docx
 from core.pdf_export import export_pdf
 from core import usage_estimate, notion_export
@@ -135,6 +136,8 @@ class LocalServer(ThreadingHTTPServer):
         self.denoise_jobs = DenoiseJobs(store)
         self.note_jobs = NoteJobs(store)
         self.correction_jobs = CorrectionJobs(store)
+        self.recycle = RecycleBin(store)
+        self.lifecycle_lock = threading.RLock()
         super().__init__(address, Handler)
 
     def server_bind(self):
@@ -266,6 +269,20 @@ class Handler(BaseHTTPRequestHandler):
                     raise APIError(str(exc)) from None
             if method == "POST" and path == "/api/courses":
                 return self._json(store.add_course(self._body().get("name")), 201)
+            if method == "GET" and path == "/api/recycle":
+                return self._json({"entries": self.server.recycle.entries()})
+            if method == "GET" and path == "/api/removal-preview":
+                return self._json(self.server.recycle.preview(query.get("kind", [""])[0], query.get("id", [""])[0]))
+            recycle_match = re.fullmatch(r"/api/recycle/([A-Za-z0-9_-]+)/restore", path)
+            if method == "POST" and recycle_match:
+                if self._body().get("confirm") is not True:
+                    raise APIError("请确认恢复这份资料。")
+                with self.server.lifecycle_lock:
+                    return self._json(self.server.recycle.restore(recycle_match[1]))
+            course_match = re.fullmatch(r"/api/courses/([A-Za-z0-9_-]+)", path)
+            if method == "DELETE" and course_match:
+                with self.server.lifecycle_lock:
+                    return self._remove("course", course_match[1])
             if method == "PUT" and path == "/api/settings":
                 return self._json(store.update_settings(self._body()))
             if method == "POST" and path == "/api/demo":
@@ -280,6 +297,11 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(self._public(result), 201)
             match = re.fullmatch(r"/api/lectures/([A-Za-z0-9_-]+)(?:/(.*))?", path)
             if match:
+                action = match[2] or ""
+                lifecycle_actions = {"local-asr", "local-repair", "local-repair/apply", "audio/denoise", "proofreading/jobs", "notes/jobs", "notes/jobs/draft", "transcribe", "notes/generate", "notion/export"}
+                if method == "DELETE" or method == "POST" and action in lifecycle_actions:
+                    with self.server.lifecycle_lock:
+                        return self._lecture(method, match[1], action, query)
                 return self._lecture(method, match[1], match[2] or "", query)
             if method == "GET" and not path.startswith("/api/"):
                 return self._static(path)
@@ -289,6 +311,8 @@ class Handler(BaseHTTPRequestHandler):
         except APIError as exc:
             self.close_connection = True
             self._json({"error": str(exc)}, exc.status)
+        except RemovalConflict as exc:
+            self._json({"error": str(exc)}, 409)
         except (StoreError, LocalSourceError) as exc:
             self._json({"error": str(exc)}, 400)
         except pipeline.PipelineError as exc:
@@ -313,9 +337,23 @@ class Handler(BaseHTTPRequestHandler):
             self.close_connection = True
             self._json({"error": "操作未完成。请检查本地文件、输入格式与接口配置后重试。"}, 500)
 
+    def _remove(self, kind, identity):
+        body = self._body()
+        if body.get("confirm") is not True:
+            raise APIError("请确认将资料移入回收站。")
+        preview = self.server.recycle.preview(kind, identity)
+        for lecture_id in preview["lecture_ids"]:
+            for manager in (self.server.jobs, self.server.repair_jobs, self.server.denoise_jobs, self.server.note_jobs, self.server.correction_jobs):
+                job = manager.get(lecture_id)
+                if job and job.get("status") in {"queued", "running", "cancelling"}:
+                    raise APIError("请先结束当前处理任务，再移除材料。", 409)
+        return self._json(self.server.recycle.remove(kind, identity, body.get("revision")))
+
     def _lecture(self, method, identity, action, query):
         store = self.server.store
         item = store.get(identity)
+        if method == "DELETE" and action in {"", "audio"}:
+            return self._remove("audio" if action == "audio" else "lecture", identity)
         if method == "POST" and action == "sources/sync":
             body = self._body()
             return self._json(self._public(sync_sources(store, identity, body.get("confirm_replace_transcript") is True)))
@@ -542,7 +580,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(self._public(store.mutate(identity, lambda lecture: edit_segments(lecture, [{**body, "id": segment_id}]))))
         if method == "GET" and action == "notes/estimate":
             try:
-                return self._json(usage_estimate.estimate(item, store.private_settings(), query.get("scope", ["all"])[0], query.get("complexity", ["standard"])[0]))
+                settings = store.private_settings()
+                scope = query.get("scope", ["all"])[0]
+                estimate = usage_estimate.estimate(item, settings, scope, query.get("complexity", ["standard"])[0])
+                if scope in {"all", "overview"} and settings["llm"].get("model") and settings["llm"].get("base_url") and estimate.get("can_run"):
+                    estimate["checkpoints"] = self.server.note_jobs.preview(item, settings, scope)
+                return self._json(estimate)
             except ValueError as exc:
                 raise APIError(str(exc)) from None
         if method == "GET" and action == "notion/preview":
@@ -559,6 +602,12 @@ class Handler(BaseHTTPRequestHandler):
             return self._json({"job": self.server.note_jobs.get(identity)})
         if method == "GET" and action == "notes/jobs/diagnostics":
             return self._json(self.server.note_jobs.diagnostics(identity))
+        if method == "GET" and action == "notes/jobs/draft":
+            return self._json(self.server.note_jobs.draft(identity))
+        if method == "POST" and action == "notes/jobs/draft":
+            if self._body().get("confirm") is not True:
+                raise APIError("请确认采用已完成的笔记草稿。")
+            return self._json(self._public(self.server.note_jobs.adopt_draft(identity)))
         if method == "POST" and action == "notes/jobs":
             body = self._body()
             if body.get("allow_external") is not True:

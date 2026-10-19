@@ -33,6 +33,8 @@
   let notesView = "overview";
   let deliveryTools;
   let revisionTools;
+  let journeyTools;
+  let workspaceTools;
   let languages = { common: [{id:"auto",label:t("自动检测")},{id:"zh",label:t("中文")},{id:"en",label:t("英语")},{id:"zh_en",label:t("中英混合")},{id:"vi",label:t("越南语")},{id:"fr",label:t("法语")},{id:"de",label:t("德语")},{id:"ja",label:t("日语")}], codes: [] };
 
   function confirmAction(message) {
@@ -268,6 +270,8 @@
     $("transcribe-button").title = t("本地 Whisper / 通义听悟网页协助 / 已配置 ASR 接口");
     deliveryTools?.refresh();
     revisionTools?.refresh();
+    journeyTools?.refresh();
+    workspaceTools?.refresh();
   }
   function renderLecture() {
     const lecture = state.lecture;
@@ -324,8 +328,9 @@
       $("playback-dock").hidden = true;
     }
     const warnings = $("lecture-warnings");
-    warnings.replaceChildren();
-    for (const warning of lecture.warnings || []) { const line=el("p", ""); I18N.renderDiagnostic(line,warning); warnings.append(line); }
+    const warningList = $("lecture-warning-list");
+    warningList.replaceChildren();
+    for (const warning of lecture.warnings || []) { const line=el("p", ""); I18N.renderDiagnostic(line,warning); warningList.append(line); }
     warnings.hidden = !(lecture.warnings || []).length;
     renderLocalSources();
     renderSegments();
@@ -663,12 +668,24 @@
     $("note-job-stream").textContent = tt`已收到输出 ${noteJob.output_chars || 0} 字符 · 思考输出 ${noteJob.reasoning_chars || 0} 字符（不是 token）`;
     const usage = noteJob.usage;
     $("note-job-usage").textContent = usage ? tt`已报告 token：输入 ${usage.prompt_tokens ?? t("未报告")} / 输出 ${usage.completion_tokens ?? t("未报告")} / 合计 ${usage.total_tokens ?? t("未报告")}` + tt` · ${noteJob.usage_reports || 0} / ${noteJob.requests_started || 0} 次请求已报告用量` : t("token 用量：接口尚未报告；通常在每次请求结束时返回。");
+    $("note-job-checkpoints").textContent = tt`已复用 ${noteJob.reused_units || 0} 批 · 本次新增断点 ${noteJob.checkpointed_units || 0} 批` + (noteJob.failure_batch ? tt` · 详细笔记第 ${noteJob.failure_batch} / ${noteJob.failure_total_batches} 批需处理` : noteJob.failure_group ? tt` · 总览第 ${noteJob.failure_synthesis_level} 层第 ${noteJob.failure_group} 组需处理` : "");
+    $("note-job-draft-actions").hidden = noteJob.status !== "failed" || !noteJob.draft_notes;
+    $("note-draft-download").href = `/api/lectures/${encodeURIComponent(state.lecture.id)}/notes/jobs/draft`;
+    $("note-job-resume").hidden = !["failed", "interrupted"].includes(noteJob.status);
     I18N.renderDiagnostic($("note-job-message"),noteJob.message || "");
     $("note-job-next").hidden = noteJob.status !== "failed";
     const diagnostics = $("note-job-diagnostics");
     diagnostics.hidden = !noteJob.diagnostics_available;
     if (noteJob.diagnostics_available) diagnostics.href = `/api/lectures/${encodeURIComponent(state.lecture.id)}/notes/jobs/diagnostics`;
     else diagnostics.removeAttribute("href");
+  }
+  async function adoptNoteDraft() {
+    if (!state.lecture || state.busy || !(await confirmAction(t("采用已完成草稿，将当前笔记存入历史；总览仍需单独完成。继续吗？")))) return;
+    await runAction($("note-draft-adopt"), t("正在保存…"), async () => {
+      const detail = await api(`/api/lectures/${encodeURIComponent(state.lecture.id)}/notes/jobs/draft`, "POST", {confirm:true});
+      notesView = "details";
+      await updateDetail(detail);
+    });
   }
   async function pollNoteJob(id) {
     window.clearTimeout(noteJobTimer);
@@ -870,6 +887,37 @@
       closeModal(true);
       notify(t("课程已创建，现在可以新建课次。"));
     } });
+  }
+  async function workspaceChanged(kind, identity) {
+    const current = state.lecture;
+    const removedCurrent = current && (kind === "lecture" && current.id === identity || kind === "course" && current.course_id === identity);
+    if (removedCurrent || kind === "audio" && current?.id === identity) {
+      requestSequence += 1;
+      repairEpoch += 1;
+      for (const timer of [jobTimer, denoiseTimer, repairTimer, noteJobTimer]) window.clearTimeout(timer);
+      localJob = denoiseJob = repairJob = noteJob = null;
+      $("audio-player").pause();
+      if (removedCurrent) state.lecture = null;
+    }
+    await refreshState();
+    if (!state.courses.some(course => course.id === state.courseId)) state.courseId = "all";
+    if (state.lecture) state.lecture = await api(`/api/lectures/${encodeURIComponent(state.lecture.id)}`);
+    renderLibrary();
+    renderLecture();
+  }
+  function journeyGo(step) {
+    if (step === 1 && !state.lecture) { showNewLecture(); return; }
+    if (step === 2 && state.lecture?.audio) { showTranscriptionRoutes(); return; }
+    if (step === 2 && state.lecture?.segments?.length) step = 3;
+    const targets = {1:state.lecture?.audio ? "import-button" : "audio-button",2:"import-button",3:"segment-list",4:"scene-select",5:"export-format"};
+    switchView(step >= 4 ? "notes" : "transcript");
+    const target = $(targets[step]);
+    if (!target) return;
+    target.scrollIntoView({block:"center",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});
+    target.classList.add("map-focus");
+    if (!target.hasAttribute("tabindex") && !target.matches("button,input,select,textarea")) target.tabIndex = -1;
+    target.focus({preventScroll:true});
+    window.setTimeout(()=>target.classList.remove("map-focus"),2200);
   }
   function showNewLecture() {
     if (!state.courses.length) { showCourse(); return; }
@@ -1674,6 +1722,7 @@
   $("category-filter").addEventListener("change", renderNotes);
   $("review-filter").addEventListener("change", renderNotes);
   $("settings-button").addEventListener("click", () => showSettings());
+  $("model-status").addEventListener("click", () => showSettings("llm"));
   $("import-button").addEventListener("click", showImport);
   $("sync-sources").addEventListener("click", syncLocalSources);
   $("audio-button").addEventListener("click", () => $("audio-input").click());
@@ -1741,10 +1790,14 @@
   $("audio-player").addEventListener("ended", updatePlayingSegment);
   $("audio-player").addEventListener("error", () => { if (state.lecture && state.lecture.audio) notify(/\.(qta|qat|qt|mov)$/i.test(state.lecture.audio.name || "") ? t("浏览器无法直接播放这份 QuickTime 录音。原件已保存，可用本地 FFmpeg 生成听课版，或在语音备忘录中重新导出 M4A；不要只修改后缀。") : t("录音暂时无法播放。请检查文件格式，或重新添加录音；转写和笔记仍保留。"), true); });
   window.addEventListener("beforeunload", (event) => { if (modalDirty || modalBusy || state.busy) { event.preventDefault(); event.returnValue = ""; } });
+  $("note-draft-adopt").addEventListener("click", adoptNoteDraft);
+  $("note-job-resume").addEventListener("click", () => generate(noteJob?.scope === "overview" ? "overview" : "llm"));
   deliveryTools = window.LectureDelivery({$, el, input, select, field, button, check, showModal, closeModal, api, confirmAction, notify,
     state:() => state, setSettings:value => { state.settings = value; renderControls(); }, reloadLecture:async () => { if (state.lecture) await updateDetail(await api(`/api/lectures/${encodeURIComponent(state.lecture.id)}`)); }});
   revisionTools = window.LectureRevisions({$, el, button, field, input, textarea, select, check, api, showModal, closeModal, confirmAction, notify,
     state:() => state, updateDetail, renderSegments, showSettings, excerptPlayer, startRepair, editSegment});
+  journeyTools = window.LectureJourney({$,el,button,state:()=>state,go:journeyGo});
+  workspaceTools = window.LectureWorkspaceTools({$,el,button,api,showModal,closeModal,confirmAction,notify,state:()=>state,changed:workspaceChanged,courseLabel});
   renderLecture();
   refreshState().then(async () => {
     const match = /^#lecture=([A-Za-z0-9_-]+)$/.exec(window.location.hash);

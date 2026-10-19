@@ -2,7 +2,7 @@
 // Local revision UI. Text-only API and audio recognition remain separate routes.
 window.LectureRevisions = function(ctx) {
   const {$,el,button,field,input,textarea,select,check,api,showModal,closeModal,confirmAction,notify}=ctx;
-  const en=window.LectureI18n.language==="en", tr=(zh,eng)=>en?eng:zh;
+  const en=window.LectureI18n.language==="en", tr=(zh,eng)=>window.LectureI18n.uiCopy(zh,eng);
   let lectureId=null,job=null,timer=null,polling=false,busy=false,showMarks=true,sequence=0;
   const bar=el("section","proofreading-bar");bar.id="proofreading-bar";bar.hidden=true;
   const heading=el("div","proofreading-heading"),title=el("strong","",tr("AI 校对稿","AI proofreading"));

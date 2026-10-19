@@ -8,6 +8,7 @@ import time
 from uuid import uuid4
 from core import pipeline, workflow, overview
 from store import now
+from note_checkpoints import NoteCheckpoints
 
 ACTIVE = {"queued", "running"}
 USAGE_KEYS = ("prompt_tokens", "completion_tokens", "total_tokens", "prompt_cache_hit_tokens", "prompt_cache_miss_tokens")
@@ -17,6 +18,32 @@ class NoteJobs:
     def __init__(self, store):
         self.store, self.lock, self.jobs = store, threading.RLock(), {}
         self.closed = threading.Event()
+        with store.connection() as conn:
+            conn.execute("CREATE TABLE IF NOT EXISTS note_drafts (lecture_id TEXT PRIMARY KEY, payload TEXT NOT NULL)")
+
+    def preview(self, item, settings, scope):
+        return NoteCheckpoints(self.store, item["id"]).preview(item, settings, scope)
+
+    def draft(self, identity):
+        with self.store.connection() as conn:
+            row = conn.execute("SELECT payload FROM note_drafts WHERE lecture_id=?", (identity,)).fetchone()
+        if not row:
+            raise pipeline.PipelineError("这节材料的草稿尚未就绪。")
+        return json.loads(row[0])
+
+    def adopt_draft(self, identity):
+        if self.get(identity) and self.get(identity)["status"] in ACTIVE:
+            raise pipeline.PipelineError("请等待当前任务完成后采用草稿。")
+        draft = self.draft(identity)
+        def save(current):
+            if overview.snapshot(current) != draft["snapshot"]:
+                raise pipeline.PipelineError("材料已更新，请先下载草稿并对照合并。")
+            notes = pipeline.validate_notes(draft["notes"], current["segments"])
+            current.setdefault("note_history", []).append({"notes": deepcopy(current["notes"]), "overview": deepcopy(current.get("overview")), "generation": deepcopy(current["generation"]), "archived_at": now()})
+            current["notes"] = notes
+            current["generation"] = {"mode": "llm", "model": draft["model"], "created_at": now(), "partial": draft["completed_batches"] < draft["total_batches"], **draft["metadata"]}
+        self.store.mutate(identity, save)
+        return self.store.get(identity)
 
     def public(self, job):
         result = {key: deepcopy(value) for key, value in job.items() if not key.startswith("_")}
@@ -48,7 +75,7 @@ class NoteJobs:
         # Persist only an allowlisted answer excerpt and numeric metadata. In
         # particular: no headers, endpoint, prompt, reasoning text or traceback.
         raw = getattr(exc, "diagnostic", {})
-        keys = ("error_code", "finish_reason", "answer_chars", "answer_excerpt", "answer_excerpt_truncated", "json_line", "json_column", "output_budget", "thinking_disabled", "synthesis_level", "group")
+        keys = ("error_code", "finish_reason", "answer_chars", "answer_excerpt", "answer_excerpt_truncated", "json_line", "json_column", "output_budget", "thinking_disabled", "synthesis_level", "group", "stage", "batch", "total_batches", "note_index")
         record = {key: raw[key] for key in keys if key in raw}
         record.update(job_id=job["id"], scope=job["scope"], model=settings["llm"]["model"], created_at=now(), message=job["message"], usage=job["usage"], requests_started=job["requests_started"], requests_finished=job["requests_finished"], output_chars=job["output_chars"], reasoning_chars=job["reasoning_chars"], warning="Private local diagnostic. The answer excerpt may contain your transcript. Do not publish it.")
         secrets = [settings.get(kind, {}).get(field) for kind in ("llm", "asr", "notion") for field in ("api_key", "base_url", "token")]
@@ -94,7 +121,7 @@ class NoteJobs:
             if self.get(item["id"]) and self.get(item["id"])["status"] in ACTIVE:
                 raise pipeline.PipelineError("本节材料已有生成任务。")
             job = {"id": "notes-" + uuid4().hex, "lecture_id": item["id"], "scope": scope, "status": "queued", "phase": "preparing", "completed_units": 0, "total_units": 1,
-                   "started_at": now(), "output_chars": 0, "reasoning_chars": 0, "requests_started": 0, "requests_finished": 0, "usage_reports": 0, "usage": None, "message": "", "_started": time.monotonic(), "_calls": [], "_current": None}
+                   "started_at": now(), "output_chars": 0, "reasoning_chars": 0, "requests_started": 0, "requests_finished": 0, "usage_reports": 0, "usage": None, "message": "", "reused_units": 0, "checkpointed_units": 0, "draft_notes": 0, "_started": time.monotonic(), "_calls": [], "_current": None}
             self.jobs[item["id"]] = job
             self.store.mutate(item["id"], lambda row: row.update(generation_job=self.public(job)))
         thread = threading.Thread(target=self._run, args=(job, deepcopy(item), deepcopy(settings)), daemon=True)
@@ -122,7 +149,7 @@ class NoteJobs:
                         current["usage"] = usage
             if event.get("request_finished"):
                 job["requests_finished"] += 1
-            for key in ("phase", "completed_units", "total_units", "synthesis_level", "output_budget", "thinking_disabled", "finish_reason"):
+            for key in ("phase", "completed_units", "total_units", "synthesis_level", "output_budget", "thinking_disabled", "finish_reason", "reused_units", "checkpointed_units"):
                 if key in event:
                     job[key] = event[key]
             job["output_chars"] = sum(call["output_chars"] for call in job["_calls"])
@@ -137,11 +164,18 @@ class NoteJobs:
             with self.lock:
                 job["status"] = "running"
             report = lambda event: self.report(job, event)
+            checkpoints = NoteCheckpoints(self.store, item["id"], report)
+            def draft(notes, completed, total):
+                value = {"notes": notes, "completed_batches": completed, "total_batches": total, "snapshot": overview.snapshot(item), "model": settings["llm"]["model"], "metadata": workflow.metadata(item.get("workflow")), "job_id": job["id"]}
+                with self.store.connection() as conn:
+                    conn.execute("INSERT OR REPLACE INTO note_drafts VALUES (?,?)", (item["id"], json.dumps(value, ensure_ascii=False)))
+                with self.lock:
+                    job.update(draft_notes=len(notes), draft_complete=completed == total)
             if job["scope"] == "all":
-                generated = pipeline.generate_llm_notes(item["segments"], settings["llm"], settings["glossary"], allow_external=True, workflow_config=item.get("workflow"), on_progress=report)
+                generated = pipeline.generate_llm_notes(item["segments"], settings["llm"], settings["glossary"], allow_external=True, workflow_config=item.get("workflow"), on_progress=report, checkpoints=checkpoints, on_draft=draft)
             else:
                 generated = {"notes": item["notes"], "warnings": [], "model": settings["llm"]["model"]}
-            summary = overview.synthesize(generated["notes"], item["segments"], settings["llm"], item.get("workflow"), allow_external=True, on_progress=report)
+            summary = overview.synthesize(generated["notes"], item["segments"], settings["llm"], item.get("workflow"), allow_external=True, on_progress=report, checkpoints=checkpoints)
             generated["warnings"] = [warning for warning in generated.get("warnings", []) if warning != "跨批次的论证联系可能缺失或重复，请人工检查上下文；没有自动声称全课综合完成。"]
             summary["model"] = settings["llm"]["model"]
             report({"phase": "saving", "completed_units": 0, "total_units": 1})
@@ -168,6 +202,10 @@ class NoteJobs:
         except Exception as exc:
             with self.lock:
                 job["message"] = str(exc) if isinstance(exc, pipeline.PipelineError) else "AI 整理未完成；已有笔记保持不变，没有自动重试。"
+                diagnostic = getattr(exc, "diagnostic", {})
+                for key in ("stage", "batch", "total_batches", "note_index", "group", "synthesis_level"):
+                    if key in diagnostic:
+                        job["failure_" + key] = diagnostic[key]
             self._save_diagnostic(job, exc, settings)
         finally:
             # Publish a terminal state only after diagnostics exist and the job

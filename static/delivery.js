@@ -3,9 +3,11 @@
 window.LectureDelivery = function (ctx) {
   const { $, el, input, select, field, button, check, showModal, closeModal, api, confirmAction, notify } = ctx;
   const en = window.LectureI18n.language === "en";
-  const tr = (zh, english) => en ? english : zh;
+  const tr = (zh, english) => window.LectureI18n.uiCopy(zh, english);
   let signature = "", seq = 0;
-  const panel = el("section", "usage-preview"); panel.id = "usage-preview"; panel.hidden = true;
+  const panel = el("details", "usage-preview"); panel.id = "usage-preview"; panel.hidden = true;
+  const compact = el("summary", "", tr("用量预估", "Usage estimate")), usageBody = el("div", "usage-body");
+  panel.append(compact,usageBody);
   const heading = el("div", "usage-heading");
   const scope = select("estimate-scope", [["all", tr("总览 + 详细笔记", "Overview + details")], ["overview", tr("仅总览", "Overview only")]], "all");
   const complexity = select("estimate-complexity", [["light", tr("简单", "Light")], ["standard", tr("标准", "Standard")], ["deep", tr("复杂讨论 / 深入整理", "Complex / in-depth")]], "standard");
@@ -13,7 +15,7 @@ window.LectureDelivery = function (ctx) {
   const options = el("div", "usage-options"); options.append(field(tr("预估任务", "Task"), scope), field(tr("预估复杂度", "Complexity estimate"), complexity));
   const numbers = el("div", "usage-numbers"); numbers.id = "usage-estimate-numbers";
   const price = el("p", "usage-price"); price.id = "usage-estimate-price";
-  panel.append(heading, options, numbers, price, el("p", "usage-caveat", tr("字符法粗估，不是预算上限；包含再次提交原文作综合。复杂度只调整预估，不修改提示词。长推理可能超出区间；实际用量以接口账单为准。", "Character-based estimate, not a budget cap. Includes resubmitting source evidence. Complexity adjusts the estimate, not prompts. Long reasoning may exceed it; provider billing is authoritative.")));
+  usageBody.append(heading, options, numbers, price, el("p", "usage-caveat", tr("按字符和任务规模粗估。复杂度用于估算；实际用量与费用以服务商账单为准。", "Estimated from text length and task size. Actual usage and charges follow the provider's bill.")));
   document.querySelector(".main-generate").before(panel);
   const opt = el("option", "", tr("PDF · 排版笔记", "PDF · designed notes")); opt.value = "pdf"; $("export-format").insertBefore(opt, $("export-format").options[1]);
   const notion = button(tr("发送到 Notion ↗", "Send to Notion ↗"), "text-button notion-export", exportNotion); notion.id = "notion-export"; document.querySelector(".notes-toolbar").after(notion);
@@ -21,6 +23,7 @@ window.LectureDelivery = function (ctx) {
   const range = r => r.map(number).join(" – ");
   const money = n => n < .01 ? n.toFixed(5) : n.toFixed(3);
   const label = d => `${d.model || tr("未选择模型", "No model")} · ${range(d.total_tokens)} token` + (d.price ? ` · ${d.price.currency} ${money(d.price.low)} – ${money(d.price.high)}` : "");
+  const checkpointLabel = d => {const c=d.checkpoints;if(!c)return "";return tr(`本地可复用：详细笔记 ${c.details_ready}/${c.details_total} 批；已知总览 ${c.overview_ready}/${c.overview_known} 组。以上用量按完整重跑估算，继续时仅新请求计费。`, `Local checkpoints: ${c.details_ready}/${c.details_total} detail batches; ${c.overview_ready}/${c.overview_known} known overview groups. The estimate above assumes a full run; only new requests incur provider usage.`);};
   async function fetchEstimate(chosenScope = scope.value) {
     const state = ctx.state(); if (!state.lecture) return null;
     return api(`/api/lectures/${encodeURIComponent(state.lecture.id)}/notes/estimate?scope=${chosenScope}&complexity=${complexity.value}`);
@@ -33,6 +36,7 @@ window.LectureDelivery = function (ctx) {
     signature = key; const id = ++seq; numbers.textContent = tr("正在本地估算…", "Estimating locally…"); price.textContent = "";
     try {
       const d = await fetchEstimate(); if (id !== seq) return;
+      compact.textContent = tr("用量预估", "Usage estimate") + (d.total_tokens ? " · " + range(d.total_tokens) + " token" : "");
       if (d.can_run === false) {
         numbers.replaceChildren(el("strong","usage-total",tr("当前任务无法开始","This task cannot start")));
         if (d.blocked_reason) {const reason=el("p");window.LectureI18n.renderDiagnostic(reason,d.blocked_reason);numbers.append(reason);}
@@ -42,6 +46,7 @@ window.LectureDelivery = function (ctx) {
       numbers.replaceChildren(el("span", "usage-model", `${d.model || tr("未选择模型", "No model")} · ${number(d.source_chars)} ${tr("字 / 字符", "characters")}`), el("strong", "usage-total", `${range(d.total_tokens)} token`), el("small", "", `${tr("输入", "Input")} ${range(d.input_tokens)} · ${tr("输出", "Output")} ${range(d.output_tokens)}`), el("small", "", `${tr("预计请求", "Estimated requests")} ${range(d.requests)}`));
       for (const stage of d.stages || []) numbers.append(el("small","usage-stage",`${stage.name==="details"?tr("详细笔记阶段","Detail extraction"):stage.name==="overview"?tr("总览综合阶段","Overview synthesis"):tr("AI 校对阶段","AI proofreading")} · ${range(stage.requests)} ${tr("次请求","requests")} · ${range(stage.input_tokens.map((v,i)=>v+stage.output_tokens[i]))} token`));
       for (const warning of d.warnings || []) {const line=el("small","usage-plan-warning");window.LectureI18n.renderDiagnostic(line,warning);numbers.append(line);}
+      if(d.checkpoints) numbers.append(el("small","usage-checkpoints",checkpointLabel(d)));
       if (d.price) {
         const p = d.price, r = p.rates;
         price.textContent = `${tr("费用粗估", "Estimated cost")} ${p.currency} ${money(p.low)} – ${money(p.high)} · ${r.as_of} · ${tr("按未命中缓存，不含税费 / 平台加价", "Uncached; excludes taxes / reseller fees")}`;
@@ -93,6 +98,6 @@ window.LectureDelivery = function (ctx) {
     if(d.can_run===false){notify(d.blocked_reason||tr("当前任务无法开始","This task cannot start"),true,true);return false;}
     const warnings=(d.warnings||[]).map(value=>window.LectureI18n.diagnostic(value)).join("\n");
     const task=scopeName==="overview"?tr("仅生成总览，保留现有详细笔记。","Generate only the overview; retain existing detailed notes."):tr("重新生成详细笔记，再生成总览。","Regenerate detailed notes, then synthesize the overview.");
-    return confirmAction(`${tr("本次粗略预估（不是费用上限）", "Rough estimate for this run (not a spending cap)")}:\n${label(d)}\n\n${task}\n${warnings}\n\n${tr("长推理可能超出区间；接口账单为准。失败请求不自动重试。继续吗？","Long reasoning may exceed this range; provider billing is authoritative. No automatic retries. Continue?")}`);
+    return confirmAction(`${tr("完整任务参考用量", "Full-task reference estimate")}:\n${label(d)}\n${checkpointLabel(d)}\n\n${task}\n${warnings}\n\n${tr("每次继续由你确认；实际用量以接口账单为准。继续吗？","Each continuation requires your confirmation; provider billing is authoritative. Continue?")}`);
   } };
 };

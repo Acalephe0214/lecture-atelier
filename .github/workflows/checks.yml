@@ -43,3 +43,4 @@ jobs:
           node tests/test_paragraphs.cjs
           node tests/test_playback.cjs
           node tests/test_panels.cjs
+          node tests/test_journey.cjs

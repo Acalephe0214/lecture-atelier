@@ -12,13 +12,13 @@ LICENSE_FILES = ("LICENSE", "licenses/README.md", "licenses/openai-whisper-LICEN
     "licenses/ctranslate2-LICENSE", "licenses/mlx-LICENSE", "licenses/pyav-LICENSE.txt", "licenses/imageio-ffmpeg-LICENSE", "licenses/reportlab-LICENSE")
 FILES = (
     "VERSION", "CHANGELOG.md",
-    "app.py", "store.py", "local_sources.py", "index_local_course.py",
-    "local_transcription.py", "local_repair.py", "asr_checkpoints.py", "audio_processing.py", "note_jobs.py",
+    "app.py", "store.py", "recycle.py", "local_sources.py", "index_local_course.py",
+    "local_transcription.py", "local_repair.py", "asr_checkpoints.py", "audio_processing.py", "note_jobs.py", "note_checkpoints.py",
     "launch.command", "setup-mac.command", "launch-windows.bat", "requirements.txt", "requirements-whisper-mac.txt",
     "AGENTS.md", "CODEX_SETUP.md", "check_setup.py", "START-HERE.html", "FRIEND-GUIDE-EN.html",
     "FRIEND-README.txt", "FRIEND-GUIDE.html", ".gitignore", ".env.example",
     "core/__init__.py", "core/pipeline.py", "core/workflow.py", "core/output_language.py", "core/audio_prepare.py", "core/asr_guard.py", "core/languages.py", "core/mixed_asr.py", "core/overview.py", "core/chat_stream.py", "core/word_export.py",
-    "static/index.html", "static/app.js", "static/style.css", "static/playback.js", "static/paragraphs.js", "static/i18n.js", "static/i18n-en.js", "static/panels.js", "static/favicon.svg",
+    "static/index.html", "static/app.js", "static/style.css", "static/workspace.css", "static/ui-copy.js", "static/journey.js", "static/workspace-tools.js", "static/playback.js", "static/paragraphs.js", "static/i18n.js", "static/i18n-en.js", "static/panels.js", "static/favicon.svg",
     "core/usage_estimate.py", "core/delivery.py", "core/pdf_export.py", "core/notion_export.py", "core/local_engine.py",
     "static/delivery.js", "bootstrap.py", "bootstrap-mac.command", "bootstrap-windows.ps1", "portable_runtime.json",
     "setup-windows.bat", "requirements-portable.txt", "requirements-pdf.txt", "requirements-speech.txt", "THIRD-PARTY-NOTICES.txt",

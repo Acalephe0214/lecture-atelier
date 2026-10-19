@@ -32,6 +32,7 @@ class Store:
         self.audio_dir = self.root / "audio"
         self.audio_dir.mkdir(exist_ok=True, mode=0o700)
         self.database = self.root / "lectures.sqlite3"
+        fresh_workspace = not self.database.exists()
         self.settings_path = self.root / "settings.json"
         self._settings_lock = threading.Lock()
         with self.connection() as conn:
@@ -39,7 +40,7 @@ class Store:
             conn.execute("CREATE TABLE IF NOT EXISTS lectures (id TEXT PRIMARY KEY, payload TEXT NOT NULL)")
             # Fresh workspaces have one generic category, never the author's
             # course list. Reopening any populated workspace preserves it as-is.
-            if not conn.execute("SELECT 1 FROM courses LIMIT 1").fetchone() and not conn.execute("SELECT 1 FROM lectures LIMIT 1").fetchone():
+            if fresh_workspace:
                 name, color, identity = SAMPLE_COURSE
                 conn.execute("INSERT OR IGNORE INTO courses VALUES (?, ?, ?)", (identity, name, color))
         try:

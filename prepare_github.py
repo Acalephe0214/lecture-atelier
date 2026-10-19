@@ -23,6 +23,7 @@ PUBLIC_TESTS = (
     "tests/test_packaging.py", "tests/test_pipeline.py", "tests/test_quicktime.py", "tests/test_reading_transcript.py",
     "tests/test_redline.py", "tests/test_server.py", "tests/test_setup_check.py", "tests/test_video_prepare.py",
     "tests/test_workflow.py", "tests/test_workflow_audit.py", "tests/test_source_release.py", "tests/test_bootstrap_profiles.py", "tests/test_evaluate_transcripts.py",
+    "tests/test_recycle.py", "tests/test_journey.cjs", "tests/test_note_checkpoints.py",
     "tests/test_i18n.cjs", "tests/test_paragraphs.cjs", "tests/test_playback.cjs", "tests/test_panels.cjs")
 SOURCE_FILES = tuple(dict.fromkeys((*APP_FILES, "package_for_friends.py", "prepare_github.py", *PUBLIC_DOCS, *PUBLIC_TESTS)))
 

@@ -4,6 +4,7 @@ const vm=require('node:vm');
 const path=require('node:path');
 const {choose,format,translator,diagnostics}=require('../static/i18n.js');
 const messages=require('../static/i18n-en.js');
+const uiCopy=require('../static/ui-copy.js');
 let checks=0;
 function check(fn){fn();checks++;}
 check(()=>assert.equal(choose('en','zh','zh-CN'),'en'));
@@ -23,7 +24,7 @@ check(()=>assert.equal(format('{0} {1}', ['$&{1}','unchanged']),'$&{1} unchanged
 check(()=>assert.equal(en.t('未知的用户标题'),'未知的用户标题'));
 const source=fs.readFileSync(path.join(__dirname,'../static/app.js'),'utf8');
 const literalKeys=[...source.matchAll(/\bt\(("(?:\\.|[^"\\])*")/g)].map(match=>JSON.parse(match[1]));
-check(()=>assert.deepEqual([...new Set(literalKeys.filter(key=>!Object.hasOwn(messages,key)))],[]));
+check(()=>assert.deepEqual([...new Set(literalKeys.filter(key=>!Object.hasOwn(messages,key)&&!Object.hasOwn(uiCopy,key)))],[]));
 check(()=>assert.ok(Object.keys(messages).length>500));
 check(()=>assert.ok(!/MutationObserver/.test(fs.readFileSync(path.join(__dirname,'../static/i18n.js'),'utf8'))));
 check(()=>assert.ok(source.includes('el("p", "", I18N.sourceText(segment))')));

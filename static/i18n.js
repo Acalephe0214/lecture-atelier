@@ -9,12 +9,12 @@
     // A callback keeps dollar signs/braces inside user text literal.
     return message.replace(/\{(\d+)\}/g, (match, index) => index < values.length ? String(values[index] ?? "") : match);
   }
-  function translator(messages, language) {
-    const t = (key, ...values) => typeof key === "string" ? format(language === "en" ? (messages[key] ?? key) : key, values) : (key ?? "");
+  function translator(messages, language, copy = {}) {
+    const t = (key, ...values) => typeof key === "string" ? format(copy[key]?.[language] ?? (language === "en" ? (messages[key] ?? key) : key), values) : (key ?? "");
     const tt = (parts, ...values) => t(parts.map((part,index) => part+(index<parts.length-1 ? `{${index}}` : "")).join(""), ...values);
     return {t, tt};
   }
-  function diagnostics(messages, language) {
+  function diagnostics(messages, language, copy = {}) {
     const hasHan = value => /\p{Script=Han}/u.test(value);
     const escape = value => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const templates = Object.entries(messages).filter(([key])=>/\{\d+\}/.test(key)).map(([key, translated])=>{
@@ -27,6 +27,7 @@
     });
     function info(value) {
       const original = String(value ?? "");
+      if (Object.hasOwn(copy,original)) return {message:copy[original][language],original:null};
       if (!original || language!=="en" || !hasHan(original)) return {message:original,original:null};
       if (Object.hasOwn(messages,original)) return {message:messages[original],original:null};
       for (const rule of templates) {
@@ -54,8 +55,8 @@
   try { saved=root.localStorage.getItem("lecture-atelier.ui-language") || ""; } catch (_) { /* URL preference still works. */ }
   const current=new URL(root.location.href);
   const language=choose(current.searchParams.get("ui"),saved,root.navigator.language);
-  const {t,tt}=translator(root.LectureEnglish || {},language);
-  const diagnosticTools=diagnostics(root.LectureEnglish || {},language);
+  const {t,tt}=translator(root.LectureEnglish || {},language,root.LectureUiCopy || {});
+  const diagnosticTools=diagnostics(root.LectureEnglish || {},language,root.LectureUiCopy || {});
   function applyStatic(document) {
     document.documentElement.lang=language==="en" ? "en" : "zh-CN";
     document.title=language==="en" ? "Lecture Atelier · Local study workspace" : "听课之间 · Lecture Atelier";
@@ -97,6 +98,7 @@
       target.append(root.document.createTextNode(" "),control,detail);
     }
   }
-  root.LectureI18n={language,locale:language==="en" ? "en-GB" : "zh-CN",t,tt,applyStatic,switchTo,...diagnosticTools,renderDiagnostic};
+  const uiCopy=(zh,en)=>(root.LectureUiCopy||{})[zh]?.[language] ?? (language==="en"?en:zh);
+  root.LectureI18n={language,locale:language==="en" ? "en-GB" : "zh-CN",t,tt,uiCopy,applyStatic,switchTo,...diagnosticTools,renderDiagnostic};
   applyStatic(root.document);
 })(typeof window === "undefined" ? {} : window);

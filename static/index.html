@@ -7,13 +7,17 @@
   <title>听课之间 · Lecture Atelier</title>
   <link rel="icon" href="./favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="./workspace.css">
   <script src="./playback.js" defer></script>
   <script src="./paragraphs.js" defer></script>
   <script src="./i18n-en.js" defer></script>
+  <script src="./ui-copy.js" defer></script>
   <script src="./i18n.js" defer></script>
   <script src="./panels.js" defer></script>
   <script src="./delivery.js" defer></script>
   <script src="./revisions.js" defer></script>
+  <script src="./journey.js" defer></script>
+  <script src="./workspace-tools.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -21,64 +25,72 @@
   <header class="masthead">
     <a class="brand" href="./index.html" aria-label="听课之间首页"><span class="brand-mark" aria-hidden="true">间</span><span><strong>听课之间</strong><small>LECTURE ATELIER</small></span></a>
     <div class="header-caption"><span>YOUR PERSONAL STUDY</span>留住课堂的线索，把理解交还给自己。</div>
-    <div class="header-actions"><label class="ui-language-control"><span class="sr-only">界面语言</span><select id="ui-language" aria-label="界面语言"><option value="zh">中文</option><option value="en">English</option></select></label><a id="help-link" class="text-button" href="/help?ui=zh" target="_blank" rel="noopener">使用说明 ↗</a><button id="reset-layout" class="layout-reset" type="button" title="恢复默认布局（也可双击分隔线）" aria-label="恢复默认布局" hidden><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="4" width="15" height="12" rx="2"/><path d="M7 4v12m6-12v12"/></svg></button><span id="workspace-status" class="local-badge"><i></i> 本地工作空间</span><button id="settings-button" class="button ghost" type="button"><span class="settings-glyph" aria-hidden="true">⚙</span> 设置与术语表 <span aria-hidden="true">↗</span></button></div>
+    <div class="header-actions"><label class="ui-language-control"><span class="sr-only">界面语言</span><select id="ui-language" aria-label="界面语言"><option value="zh">中文</option><option value="en">English</option></select></label><button id="journey-button" class="button journey-button" type="button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2 5-5 2 2-5Z"/></svg>流程地图</button><a id="help-link" class="sr-only" href="/help?ui=zh" target="_blank" rel="noopener">使用说明 ↗</a><button id="reset-layout" class="layout-reset" type="button" title="恢复默认布局（也可双击分隔线）" aria-label="恢复默认布局" hidden><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><rect x="2.5" y="4" width="15" height="12" rx="2"/><path d="M7 4v12m6-12v12"/></svg></button><span id="workspace-status" class="local-badge"><i></i> 本地工作空间</span><button id="settings-button" class="button ghost" type="button"><span class="settings-glyph" aria-hidden="true">⚙</span> 设置与术语表 <span aria-hidden="true">↗</span></button></div>
   </header>
   <aside id="startup-guide" class="startup-guide" role="note" hidden><div><strong>你正在查看页面预览</strong><span>完整使用请双击项目中的 launch.command，再打开本地工作台。</span></div><a href="http://127.0.0.1:8767/">打开已启动的 App <span aria-hidden="true">↗</span></a></aside>
   <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
   <nav class="mobile-tabs" aria-label="工作区视图"><button data-view="library" class="active" type="button">课程</button><button data-view="transcript" type="button">原文与录音</button><button data-view="notes" type="button">课堂笔记</button></nav>
   <div class="workspace" data-mobile-view="library">
     <aside id="library-panel" class="library panel" aria-label="课程与课次">
-      <div class="sidebar-heading"><span class="eyebrow">THE COURSE ARCHIVE</span><button id="add-course" class="icon-button" aria-label="新增课程" title="新增课程" type="button">＋</button></div>
+      <div class="sidebar-heading"><span class="eyebrow">THE COURSE ARCHIVE</span><button id="add-course" class="button sidebar-create" type="button">＋ 新建课程</button></div>
       <div class="library-title">我的课程<span class="library-subtitle">每一次理解，都有来处。</span></div>
-      <div id="course-list" class="course-list"></div>
+      <div id="course-list" class="course-list"></div><div class="library-tools"><button id="manage-courses" class="text-button" type="button">管理课程</button><button id="recycle-bin" class="text-button" type="button">回收站</button></div>
       <div class="library-divider"></div>
       <label class="search-box"><span aria-hidden="true">⌕</span><input id="lecture-search" type="search" placeholder="搜索课次标题" aria-label="搜索课次标题"></label>
-      <div class="lecture-list-heading"><span id="lecture-count">课次</span><button id="new-lecture" class="text-button" type="button">＋ 新建课次</button></div>
+      <div class="lecture-list-heading"><span id="lecture-count">课次</span><button id="new-lecture" class="button sidebar-create" type="button">＋ 新建课次</button></div>
       <div id="lecture-list" class="lecture-list"></div>
-      <div class="sidebar-bottom"><div class="archive-ornament" aria-hidden="true"><svg viewBox="0 0 180 52" fill="none"><path d="M1 42h178M22 42V27a22 22 0 0 1 44 0v15M31 42V27a13 13 0 0 1 26 0v15M85 42V9h31v33M91 18h19M91 25h19M91 32h13M133 42l17-28 17 28M142 42l8-14 8 14"/><circle cx="150" cy="8" r="3"/></svg><span>A LITTLE SPACE TO THINK</span></div><button id="demo-button" class="button secondary full-width" type="button">探索虚构示例 <span aria-hidden="true">↗</span></button><p>从一个虚构片段，熟悉这张书桌。<br>不含真实课堂或个人资料。</p><div class="privacy-note"><span aria-hidden="true">◈</span> 默认保存在本机。仅在你逐次同意时，向已配置的接口发送材料。</div></div>
+      <div class="sidebar-bottom"><div class="archive-ornament" aria-hidden="true"><svg viewBox="0 0 180 52" fill="none"><path d="M1 42h178M22 42V27a22 22 0 0 1 44 0v15M31 42V27a13 13 0 0 1 26 0v15M85 42V9h31v33M91 18h19M91 25h19M91 32h13M133 42l17-28 17 28M142 42l8-14 8 14"/><circle cx="150" cy="8" r="3"/></svg><span>A LITTLE SPACE TO THINK</span></div><button id="demo-button" class="button secondary full-width" type="button">探索虚构示例 <span aria-hidden="true">↗</span></button><p>虚构示例 · 可自由试用</p><div class="privacy-note"><span aria-hidden="true">◈</span> 默认保存在本机。仅在你逐次同意时，向已配置的接口发送材料。</div></div>
     </aside>
     <div id="resize-library" class="panel-resizer" role="separator" aria-orientation="vertical" aria-label="调整目录与正文宽度" aria-controls="library-panel main-content" aria-describedby="panel-resize-help" tabindex="0"><span aria-hidden="true"></span></div>
     <main id="main-content" class="transcript-panel panel" tabindex="-1">
       <div id="transcript-empty" class="empty-workspace">
         <div class="empty-illustration" aria-hidden="true"><svg viewBox="0 0 240 200" fill="none"><path class="art-wash" d="M43 171V87a58 58 0 0 1 116 0v84H43Z"/><path class="art-arch" d="M52 171V87a49 49 0 0 1 98 0v84M63 171V87a38 38 0 0 1 76 0v84"/><circle class="art-sun" cx="171" cy="48" r="21"/><path class="art-book" d="m97 114 44-9 49 13v55l-49-12-44 9v-56Z"/><path class="art-ink" d="M141 106v55M107 127l23-5m-23 15 23-5m-23 15 23-5m23-18 26 7m-26 3 26 7m-26 3 19 5M27 175h184M40 184h29m113 0h15"/></svg><span>NOTES / THOUGHTS / CONNECTIONS</span></div>
-        <span class="eyebrow">给思考，一点安静的空间</span>
-        <h1>从一节课，<br>开始整理你的理解。</h1>
-        <p>导入转写稿，保留每个概念与论证的出处。<br>笔记不是终点，而是回到课堂的入口。</p>
+        <span class="eyebrow">A LITTLE SPACE TO BEGIN</span>
+        <h1>从录音或文字稿开始</h1>
+        <p>导入材料，校对文字，再整理成笔记。</p>
         <button id="empty-new-lecture" class="button primary" type="button">新建第一节课 <span aria-hidden="true">＋</span></button>
         <div class="empty-steps"><span><b>01</b> 导入材料</span><span><b>02</b> 整理与核查</span><span><b>03</b> 回听与复习</span></div>
       </div>
       <section id="lecture-content" hidden>
-        <div class="lecture-heading"><div class="heading-topline"><div class="document-kicker"><span class="document-label">LECTURE NOTES</span><span class="kicker-divider" aria-hidden="true">/</span><span id="lecture-course" class="eyebrow"></span></div><button id="edit-lecture" class="text-button" type="button">编辑课次 <span aria-hidden="true">↗</span></button></div><h1 id="lecture-title"></h1><div id="lecture-meta" class="lecture-meta"></div></div>
-        <div class="material-toolbar"><button id="import-button" class="button secondary compact" type="button">导入转写稿</button><button id="audio-button" class="button ghost compact" type="button">＋ 添加录音</button><input id="audio-input" type="file" accept="audio/*,video/quicktime,.mp3,.m4a,.wav,.ogg,.webm,.mp4,.aac,.flac,.opus,.qta,.qat,.qt,.mov" hidden><button id="transcribe-button" class="button ghost compact" type="button">选择转写路线 ↗</button></div>
-        <p class="source-help audio-format-help">可添加音频及 MP4 / MOV / WEBM 视频。本地转写前先提取视频音轨并缓存，原文件保留；不自动上传云端。</p>
+        <div class="lecture-heading"><div class="heading-topline"><div class="document-kicker"><span class="document-label">LECTURE NOTES</span><span class="kicker-divider" aria-hidden="true">/</span><span id="lecture-course" class="eyebrow"></span></div><details class="session-options"><summary>课次选项</summary><div><button id="edit-lecture" class="text-button" type="button">编辑课次</button><button id="remove-lecture" class="text-button remove-button" type="button">移除课次</button></div></details></div><h1 id="lecture-title"></h1><div id="lecture-meta" class="lecture-meta"></div></div>
+        <div class="material-toolbar"><button id="import-button" class="button secondary compact" type="button">导入转写稿</button><button id="audio-button" class="button secondary compact" type="button">＋ 添加录音</button><input id="audio-input" type="file" accept="audio/*,video/quicktime,.mp3,.m4a,.wav,.ogg,.webm,.mp4,.aac,.flac,.opus,.qta,.qat,.qt,.mov" hidden><button id="transcribe-button" class="button primary compact" type="button">选择转写路线 ↗</button></div>
+        <details class="quiet-details"><summary>素材说明</summary><p class="source-help audio-format-help">可添加音频及 MP4 / MOV / WEBM 视频。本地转写前先提取视频音轨并缓存，原文件保留；不自动上传云端。</p></details>
         <div id="workflow-strip" class="workflow-strip"><span class="workflow-step"><b>01</b> 录音 / 现成稿</span><span aria-hidden="true">→</span><span class="workflow-step"><b>02</b> 校对与回听</span><span aria-hidden="true">→</span><span class="workflow-step"><b>03</b> 按用途整理</span></div>
         <div id="transcription-status" class="transcription-status" hidden><div><strong id="job-title"></strong><p id="job-message"></p><p id="job-detail"></p><progress id="job-progress" max="100" value="0" aria-label="音频处理进度，不代表转写正确率"></progress></div><div class="job-actions"><button id="cancel-local-asr" class="button secondary compact" type="button">取消任务</button><button id="resume-local-asr" class="button primary compact" type="button" hidden>从断点继续</button><button id="restart-local-asr" class="text-button" type="button" hidden>不复用断点重跑</button></div></div>
         <details id="asr-report" class="asr-report" hidden><summary id="asr-report-title">本地转写检查</summary><div id="asr-report-body"></div></details>
         <div class="source-provenance"><span id="transcript-provenance">尚未导入文字稿</span><button id="ai-correct" class="text-button" type="button">AI 校对建议 ↗</button><button id="review-corrections" class="text-button" type="button" hidden>查看校对建议</button></div>
-        <div id="audio-container" class="audio-card" hidden><div class="audio-label"><span>课堂录音 · 仅本机</span><span id="audio-filename"></span></div><div class="audio-version-row"><label for="audio-version">试听版本</label><select id="audio-version"><option value="original">原录音</option></select><button id="generate-denoised" class="button secondary compact" type="button">生成降噪听课版</button></div><div id="denoise-status" class="denoise-status" role="status" aria-live="polite" hidden></div><audio id="audio-player" controls preload="metadata"></audio><p id="audio-version-note" class="audio-version-note"></p></div>
-        <div id="lecture-warnings" class="lecture-warnings" hidden></div>
+        <div id="audio-container" class="audio-card" hidden><div class="audio-actions"><button id="remove-audio" class="text-button remove-button" type="button">移除录音</button></div><div class="audio-label"><span>课堂录音 · 仅本机</span><span id="audio-filename"></span></div><div class="audio-version-row"><label for="audio-version">试听版本</label><select id="audio-version"><option value="original">原录音</option></select><button id="generate-denoised" class="button secondary compact" type="button">生成降噪听课版</button></div><div id="denoise-status" class="denoise-status" role="status" aria-live="polite" hidden></div><audio id="audio-player" controls preload="metadata"></audio><p id="audio-version-note" class="audio-version-note"></p></div>
+        <details id="lecture-warnings" class="lecture-warnings" hidden><summary>原文检查与处理记录</summary><div id="lecture-warning-list"></div></details>
         <details id="linked-source-card" class="linked-source-card" aria-label="本地索引文件" hidden><summary class="linked-source-heading"><div><span class="eyebrow">LOCAL FILE INDEX</span><h3>原文件，就在原处。</h3></div><span id="source-index-summary" class="source-index-summary"></span><span class="source-chevron" aria-hidden="true">⌄</span></summary><div class="linked-source-content"><p class="source-index-help">直接读取原录音，不复制。文字稿解析为缓存；修改原文件后请同步。</p><button id="sync-sources" class="button secondary compact" type="button">检查并同步 ↻</button><div id="linked-source-list" class="linked-source-list"></div><details id="source-context-details" class="source-context" hidden><summary>原稿说明与整理附记</summary><div id="source-context-body"></div></details></div></details>
         <div class="section-heading"><div><span class="eyebrow">SOURCE MATERIAL</span><h2>原文与时间线 <span id="segment-count" class="count"></span></h2></div><label class="transcript-search"><span class="sr-only">搜索原文</span><input id="segment-search" type="search" placeholder="查找原文…"></label></div>
         <div class="reading-toolbar"><label for="transcript-view">阅读方式</label><select id="transcript-view"><option value="paragraphs">段落阅读</option><option value="sentences">逐句时间线</option></select><label for="recording-language">录音语言</label><select id="recording-language"></select><button id="language-help" class="text-button" type="button">语言范围 ↗</button></div>
-        <div class="source-help">按句末、停顿和长度排成阅读段落，非 AI 改写。时间码与来源编号不变；展开逐句校对可边听边补字。</div>
+        <details class="quiet-details"><summary>阅读说明</summary><div class="source-help">按句末、停顿和长度排成阅读段落，非 AI 改写。时间码与来源编号不变；展开逐句校对可边听边补字。</div></details>
         <div id="segment-list" class="segment-list"></div>
       </section>
     </main>
     <div id="resize-notes" class="panel-resizer" role="separator" aria-orientation="vertical" aria-label="调整正文与笔记宽度" aria-controls="main-content notes-panel" aria-describedby="panel-resize-help" tabindex="0"><span aria-hidden="true"></span></div>
     <section id="notes-panel" class="notes-panel panel" aria-label="结构化课堂笔记">
       <div class="notes-overview"><div class="notes-heading"><div><span class="eyebrow">MAKE THE CONNECTIONS</span><h2>课堂笔记 <span id="note-count" class="count"></span></h2></div><button id="add-note" class="icon-button" type="button" aria-label="手动添加笔记" title="手动添加笔记">＋</button></div>
-      <div id="generation-label" class="generation-label">先选择一节课</div>
-      <div class="scene-picker"><label for="scene-select">整理用途</label><select id="scene-select"><option value="class">课程精读</option><option value="lecture">讲座速览</option><option value="discussion">课堂讨论</option><option value="meeting">会议纪要</option><option value="custom">自定义用途</option></select><button id="workflow-settings" class="text-button" type="button">提示词 ↗</button><p id="scene-description">概念、论证、例子与复习线索。</p></div>
-      <div class="output-language-row"><label for="output-language">笔记输出语言</label><select id="output-language" aria-describedby="output-language-help"><option value="zh">中文</option></select><button id="output-language-settings" class="text-button" type="button">语言设置 ↗</button><p id="output-language-help">独立于界面和录音语言。只影响下次 AI 笔记与总览，不翻译原稿或已有内容。</p></div>
-      <div class="generate-actions main-generate"><button id="llm-generate" class="button primary" type="button">AI 总览与详细笔记 <span aria-hidden="true">↗</span></button><button id="overview-generate" class="button secondary" type="button">仅补生成总览</button></div>
+      <div id="generation-label" class="generation-label">选用途、选语言，生成重点与详细笔记。</div>
+      <div class="scene-picker"><label for="scene-select">整理用途</label><select id="scene-select"><option value="class">课程精读</option><option value="lecture">讲座速览</option><option value="discussion">课堂讨论</option><option value="meeting">会议纪要</option><option value="custom">自定义用途</option></select><button id="workflow-settings" class="text-button" type="button">提示词 ↗</button></div>
+      <div class="output-language-row"><label for="output-language">笔记输出语言</label><select id="output-language" aria-describedby="output-language-help"><option value="zh">中文</option></select><button id="output-language-settings" class="text-button" type="button">语言设置 ↗</button></div>
+      <details class="quiet-details note-setup-details"><summary>生成设置</summary><p id="scene-description">概念、论证、例子与复习线索。</p><p id="output-language-help">用于下一次生成的笔记与总览。</p></details><div class="generate-actions main-generate"><button id="llm-generate" class="button primary" type="button">AI 总览与详细笔记 <span aria-hidden="true">↗</span></button><button id="overview-generate" class="button secondary" type="button">仅补生成总览</button></div>
       <details class="excerpt-tool"><summary>其他工具 · 原句复制卡片</summary><p>只把原文逐段复制到笔记区，不校对、不概括，也不是原稿备份版本。校订文字直接在中间原文区完成；只需导出原文时选择 TXT 或 SRT 即可。</p><button id="local-generate" class="text-button" type="button">生成原句复制卡片（非总结）</button></details>
-      <section id="note-job" class="note-job" aria-label="AI 整理进度" hidden><div class="note-job-heading"><strong id="note-job-title"></strong><span id="note-job-elapsed"></span></div><p id="note-job-detail"></p><progress id="note-job-progress" max="1" value="0" aria-label="当前阶段已完成的单元，不代表正确率"></progress><p id="note-job-policy" hidden></p><p id="note-job-stream"></p><p id="note-job-usage"></p><small>每秒更新本地状态。token 仅显示接口已报告的用量；未报告不等于零，也不是费用估算。</small><p id="note-job-message" role="status"></p><p id="note-job-next" hidden>本次没有保存新总览，已有笔记与旧总览仍保留。请查看失败原因；再次点击生成会重新调用接口并可能计费。</p><a id="note-job-diagnostics" class="button secondary" download="lecture-atelier-diagnostic.json" hidden>下载失败诊断（含返回正文，请勿公开）</a></section>
-      <div id="model-status" class="model-status">模型接口未配置 · 本地摘录无需 API</div></div>
+      <section id="note-job" class="note-job" aria-label="AI 整理进度" hidden>
+        <div class="note-job-heading"><strong id="note-job-title"></strong><span id="note-job-elapsed"></span></div>
+        <p id="note-job-detail"></p><progress id="note-job-progress" max="1" value="0" aria-label="当前阶段已完成的单元，不代表正确率"></progress>
+        <p id="note-job-usage"></p><p id="note-job-checkpoints"></p>
+        <details class="quiet-details job-details"><summary>处理详情</summary><p id="note-job-policy" hidden></p><p id="note-job-stream"></p><small>每秒更新本地状态。token 仅显示接口已报告的用量；未报告不等于零，也不是费用估算。</small></details>
+        <p id="note-job-message" role="status"></p><p id="note-job-next" hidden>成功批次已保存为本地断点；继续时复用匹配结果，新请求按接口计费。</p>
+        <div id="note-job-draft-actions" class="draft-actions" hidden><a id="note-draft-download" class="button secondary" download="lecture-atelier-notes-draft.json">下载已完成笔记草稿</a><button id="note-draft-adopt" class="button secondary">采用已完成笔记</button></div>
+        <button id="note-job-resume" class="button primary" hidden>从断点继续…</button>
+        <a id="note-job-diagnostics" class="button secondary" download="lecture-atelier-diagnostic.json" hidden>下载失败诊断（含返回正文，请勿公开）</a>
+      </section>
+      <button id="model-status" class="model-status text-button" type="button">模型接口未配置 · 本地摘录无需 API</button></div>
       <div class="notes-view-tabs" role="tablist" aria-label="笔记阅读视图"><button id="overview-tab" type="button" role="tab" aria-controls="overview-content" aria-selected="true">总结总览</button><button id="detail-tab" type="button" role="tab" aria-controls="notes-list" aria-selected="false">详细笔记</button></div>
       <div class="notes-toolbar"><label><span class="sr-only">按笔记类别筛选</span><select id="category-filter"><option value="all">全部类别</option><option value="question">核心问题</option><option value="concept">概念</option><option value="argument">论证</option><option value="example">例子</option><option value="objection">反对意见</option><option value="comment">课堂评论</option><option value="decision">明确决议</option><option value="action">待办事项</option><option value="disagreement">讨论分歧</option><option value="review">待核对</option></select></label><label><span class="sr-only">按核查状态筛选</span><select id="review-filter"><option value="all">全部状态</option><option value="unreviewed">未核查</option><option value="verified">已核查</option><option value="needs_review">待复核</option></select></label><label class="export-control"><span class="sr-only">导出格式</span><select id="export-format"><option value="">导出 ↓</option><option value="md">Markdown 笔记</option><option value="json">JSON 完整数据</option><option value="srt">SRT 字幕</option><option value="txt">TXT 转写稿</option></select></label><button id="archived-notes" class="text-button" type="button" hidden>恢复归档</button></div>
       <section id="overview-content" class="overview-content" role="tabpanel" aria-labelledby="overview-tab"></section>
       <div id="notes-list" class="notes-list" role="tabpanel" aria-labelledby="detail-tab" hidden></div>
-      <footer class="notes-footer"><span aria-hidden="true">◇</span> 有出处不等于已经正确。请回听、核对，再标记为已核查。</footer>
     </section>
   </div>
   <p id="panel-resize-help" class="sr-only">拖动分隔线调整宽度；方向键微调，Shift 加速，双击或 Home 恢复默认布局。</p>

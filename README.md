@@ -24,6 +24,8 @@ Turn lecture, talk or meeting **recordings/transcripts into editable documents a
 
 **Just looking around?** Start the app and choose **Explore fictional demo** to read, edit and export without accounts, keys or your own recording. Running the app requires Python; see setup below.
 
+The upper-right **Journey map** shows five clickable steps, the relevant controls and each step's output. **Manage courses**, **Session options → Remove session**, and **Remove audio** move selected records to the local **Recycle bin**, where they can be restored. Removing an audio link retains the transcript, notes and original file.
+
 ![Fictional transcript and notes in Lecture Atelier](docs/images/workspace.png)
 
 <a id="start"></a>
@@ -102,6 +104,8 @@ To check terminology or apparent mistakes with AI:
 In the right panel, select a class, talk, discussion, meeting or custom purpose, then a note output language: Chinese, English, French, German, Vietnamese, Japanese or matching the source. This affects the next AI generation, not existing transcripts/notes.
 
 Choose **AI overview + detailed notes**, inspect the usage estimate and confirm. Stage progress and provider-reported tokens are displayed. Estimates are not spending caps; the provider's bill is authoritative.
+
+**If generation fails:** successful detail batches and overview groups are checkpointed locally. **Continue from checkpoints** revalidates and reuses exact matching results; only new requests contribute to the current run's token count. Completed detail batches also remain available as a downloadable draft, with an explicit **Use completed notes** action. Existing notes stay intact until you choose to replace them. Changed source text, prompts, output language, model or endpoint invalidate affected checkpoints. A failed request may still be billed; checkpoints cannot recover answers discarded by older versions.
 
 - **Executive overview:** global key information; meeting mode also separates explicit decisions, actions and unresolved questions. Rejected proposals must not become final decisions.
 - **Detailed notes:** concepts, arguments, discussions or topics, depending on the purpose, with source links.

@@ -202,6 +202,7 @@ def validate(value, segments):
         for row in rows:
             if not isinstance(row, dict):
                 raise pipeline.PipelineError("全局总结条目格式无效。")
+            row = pipeline.normalize_model_sources(row, segments)
             checked = pipeline.validate_notes([{**{key: row.get(key) for key in ("title", "content", "source_ids")}, "category": category}], segments)[0]
             checked.pop("id", None)
             if name == "decisions":
@@ -217,7 +218,7 @@ def validate(value, segments):
     return result
 
 
-def synthesize(notes, segments, settings, workflow_config, allow_external=False, on_progress=None):
+def synthesize(notes, segments, settings, workflow_config, allow_external=False, on_progress=None, checkpoints=None):
     config = workflow.normalize(workflow_config)
     endpoint, model, headers = pipeline._configuration(settings, allow_external, "LLM", "/chat/completions")
     if not notes:
@@ -239,22 +240,25 @@ def synthesize(notes, segments, settings, workflow_config, allow_external=False,
             policy = request_policy(endpoint, model)
             report({"phase": "overview", "completed_units": index, "total_units": len(groups), "synthesis_level": level, "output_budget": MAX_TOKENS, "thinking_disabled": "thinking" in policy})
             body = {**payload(group, config, model, len(groups) > 1), **policy}
-            if on_progress:
-                from .chat_stream import chat
-                report({"request_started": True})
-                response = chat(endpoint, body, headers, report)
-                report({"request_finished": True})
-            else:
-                response = json.loads(pipeline._request_bytes(endpoint, json.dumps(body, ensure_ascii=False).encode(), {**headers, "Content-Type": "application/json"}))
-            diagnostic = {}
-            try:
-                value, diagnostic = parse_response(response)
-                report({"finish_reason": diagnostic["finish_reason"]})
-                results.append(validate(value, group["sources"]))
-            except pipeline.PipelineError as exc:
-                diagnostic = getattr(exc, "diagnostic", diagnostic)
-                diagnostic.update(output_budget=MAX_TOKENS, thinking_disabled="thinking" in policy, synthesis_level=level, group=index + 1, error_code=diagnostic.get("error_code", "invalid_evidence_or_schema"))
-                raise ModelOutputError(str(exc), diagnostic) from None
+            def fetch():
+                if on_progress:
+                    from .chat_stream import chat
+                    report({"request_started": True})
+                    response = chat(endpoint, body, headers, report)
+                    report({"request_finished": True})
+                    return response
+                return json.loads(pipeline._request_bytes(endpoint, json.dumps(body, ensure_ascii=False).encode(), {**headers, "Content-Type": "application/json"}))
+            def check(response):
+                diagnostic = {}
+                try:
+                    value, diagnostic = parse_response(response)
+                    report({"finish_reason": diagnostic["finish_reason"]})
+                    return validate(value, group["sources"])
+                except pipeline.PipelineError as exc:
+                    diagnostic = getattr(exc, "diagnostic", diagnostic)
+                    diagnostic.update(stage="overview", output_budget=MAX_TOKENS, thinking_disabled="thinking" in policy, synthesis_level=level, group=index + 1, error_code=diagnostic.get("error_code", "invalid_evidence_or_schema"))
+                    raise ModelOutputError(str(exc), diagnostic) from None
+            results.append(checkpoints.run("overview", endpoint, body, fetch, check) if checkpoints else check(fetch()))
             report({"phase": "overview", "completed_units": index + 1, "total_units": len(groups), "synthesis_level": level})
         if len(results) == 1:
             return {**results[0], "output_language": config["output_language"]}

@@ -416,7 +416,47 @@ def complete_json(content):
     return json.loads(fenced[1] if fenced else value)
 
 
-def generate_llm_notes(segments, settings, glossary=None, allow_external=False, workflow_config=None, on_progress=None):
+def normalize_model_sources(row, segments):
+    """Normalize representation only; never infer, drop or invent a citation."""
+    row = dict(row)
+    sources = row.get("source_ids")
+    if isinstance(sources, str):
+        sources = [sources]
+    if isinstance(sources, list):
+        row["source_ids"] = [sid.strip() if isinstance(sid, str) else sid for sid in sources]
+    return row
+
+
+def validate_model_notes(response, batch):
+    diagnostic = {"error_code": "invalid_notes", "answer_excerpt": "", "answer_chars": 0}
+    try:
+        choice = response["choices"][0]
+        content = choice["message"]["content"]
+        if isinstance(content, str):
+            diagnostic.update(answer_excerpt=content[:64000], answer_chars=len(content), answer_excerpt_truncated=len(content) > 64000)
+        diagnostic["finish_reason"] = choice.get("finish_reason")
+        if choice.get("finish_reason") in {"length", "content_filter"} or choice["message"].get("refusal"):
+            raise PipelineError("本批模型输出被截断或过滤，处理已暂停。")
+        raw_notes = complete_json(content)["notes"]
+        if not isinstance(raw_notes, list) or not raw_notes:
+            raise PipelineError("模型返回的 notes 需要是非空数组。")
+        clean = []
+        for index, row in enumerate(raw_notes, 1):
+            diagnostic["note_index"] = index
+            if not isinstance(row, dict):
+                raise PipelineError("模型返回无效笔记条目，处理已暂停。")
+            row = normalize_model_sources(row, batch)
+            clean.append({key: row.get(key) for key in ("category", "title", "content", "source_ids")})
+            validate_notes([clean[-1]], batch)
+        return validate_notes(clean, batch)
+    except (ValueError, KeyError, TypeError, IndexError, UnicodeError, RecursionError) as exc:
+        message = str(exc) if isinstance(exc, PipelineError) else "模型没有返回约定的完整 JSON 笔记，处理已暂停。"
+        error = PipelineError(message)
+        error.diagnostic = diagnostic
+        raise error from None
+
+
+def generate_llm_notes(segments, settings, glossary=None, allow_external=False, workflow_config=None, on_progress=None, checkpoints=None, on_draft=None):
     try:
         scene_instructions = workflow.scene_prompt(workflow_config)
         generation_metadata = workflow.metadata(workflow_config)
@@ -433,37 +473,23 @@ def generate_llm_notes(segments, settings, glossary=None, allow_external=False, 
             on_progress({"phase": "notes", "completed_units": batch_index - 1, "total_units": len(batches)})
         payload = notes_payload(batch, glossary, workflow_config, model)
         headers["Content-Type"] = "application/json"
-        if on_progress:
-            from .chat_stream import chat
-            on_progress({"request_started": True})
-            response = chat(endpoint, payload, headers, on_progress)
-            on_progress({"request_finished": True})
-        else:
-            body = _request_bytes(endpoint, json.dumps(payload, ensure_ascii=False).encode("utf-8"), headers)
-            response = None
+        def fetch():
+            if on_progress:
+                from .chat_stream import chat
+                on_progress({"request_started": True})
+                response = chat(endpoint, payload, headers, on_progress)
+                on_progress({"request_finished": True})
+                return response
+            raw = _request_bytes(endpoint, json.dumps(payload, ensure_ascii=False).encode("utf-8"), headers)
+            try:
+                return json.loads(raw.decode("utf-8"))
+            except (ValueError, UnicodeError, RecursionError):
+                raise PipelineError("模型没有返回约定的完整 JSON 笔记，处理已暂停。") from None
         try:
-            response = response if response is not None else json.loads(body.decode("utf-8"))
-            choice = response["choices"][0]
-            if not isinstance(choice,dict):raise ValueError()
-            if choice.get("finish_reason") == "length":
-                raise PipelineError("模型输出被服务截断，本次未保存笔记；请减少单次材料或调整服务限制。")
-            content = choice["message"]["content"]
-            if not isinstance(content, str):
-                raise ValueError()
-            parsed = complete_json(content)
-            raw_notes = parsed["notes"]
-        except PipelineError:
+            validated = checkpoints.run("notes", endpoint, payload, fetch, lambda response: validate_model_notes(response, batch)) if checkpoints else validate_model_notes(fetch(), batch)
+        except PipelineError as exc:
+            exc.diagnostic = {**getattr(exc, "diagnostic", {}), "stage": "notes", "batch": batch_index, "total_batches": len(batches)}
             raise
-        except (ValueError, KeyError, TypeError, IndexError, UnicodeError, RecursionError):
-            raise PipelineError("模型没有返回约定的 JSON 笔记，未保存本次结果。请检查接口兼容性或重试。") from None
-        if not isinstance(raw_notes, list):
-            raise PipelineError("模型返回的 notes 不是数组，未保存结果。")
-        clean = []
-        for row in raw_notes:
-            if not isinstance(row, dict):
-                raise PipelineError("模型返回无效笔记条目，未保存结果。")
-            clean.append({key: row.get(key) for key in ("category", "title", "content", "source_ids")})
-        validated = validate_notes(clean, batch)
         cited = {sid for note in validated for sid in note["source_ids"]}
         # Missing coverage is surfaced as exact source excerpts, never silently dropped.
         for row in batch:
@@ -476,6 +502,8 @@ def generate_llm_notes(segments, settings, glossary=None, allow_external=False, 
             note["review_status"] = "unreviewed"
             note["user_edited"] = False
             all_notes.append(note)
+        if on_draft:
+            on_draft(all_notes, batch_index, len(batches))
         if on_progress:
             on_progress({"phase": "notes", "completed_units": batch_index, "total_units": len(batches)})
     warnings = list(dict.fromkeys(warnings))
