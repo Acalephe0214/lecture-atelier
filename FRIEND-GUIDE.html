@@ -11,23 +11,25 @@
 <section id="prepare"><h2>01 / 收到 ZIP 后，先别点里面的代码</h2><ol>
 <li><strong>完整解压。</strong>Mac 在 Finder 双击 ZIP；Windows 对 ZIP 使用“全部解压”。进入解压后的 <code>LectureAtelier</code>，应看到 <code>app.py</code>、<code>static</code>、<code>START-HERE.html</code> 和安装脚本。</li>
 <li><strong>放到固定、自己有写入权限的位置。</strong>例如“文稿 / Documents”。不要在 ZIP 预览中启动，不要只拖出一个 .app，不覆盖已有使用目录。</li>
-<li><strong>准备网络和空间。</strong>首次约下载 0.5–1.5 GB，建议留 2–4 GB 磁盘；需能连接 GitHub、PyPI、Hugging Face。大小、速度依平台与缓存而变，不保证几分钟装完。</li>
+<li><strong>准备网络和空间。</strong>基础模式复用 Python，缺少时仅从 GitHub 下载运行环境；可选语音模式约下载 0.5–1.5 GB、预留 2–4 GB，另需 PyPI、Hugging Face 可达。大小、速度依平台与缓存而变，不保证几分钟装完。</li>
 <li><strong>基础功能无需账号。</strong>本地处理不需 API key 或管理员权限；云端 AI 功能需配置相应服务。</li></ol>
-<p>默认安装多语言 CPU <code>faster-whisper small</code>，面向 Mac（M 系列或 Intel）和 Windows 10/11 x64；Windows ARM64 不在范围。Windows 脚本尚未真机验收，不能把提供脚本当成所有电脑都已验证。已有 M 系列 Mac 的 MLX 配置会保留。</p></section>
+<p>可选 speech 模式安装多语言 CPU <code>faster-whisper small</code>，面向 Mac（M 系列或 Intel）和 Windows 10/11 x64；Windows ARM64 不在范围。Windows 脚本尚未真机验收，不能把提供脚本当成所有电脑都已验证。已有 M 系列 Mac 的 MLX 配置会保留。</p></section>
 
-<section id="install"><h2>02 / 首次安装：只做一次</h2><h3>Mac：在 Finder 里操作</h3><ol>
-<li>双击解压目录里的 <code>setup-mac.command</code>。应打开 Terminal（终端），不是只在编辑器显示代码。</li>
-<li>阅读提示。确认信任来源、愿意下载后，在 <code>[y/N]</code> 后输入 <code>y</code>，按回车；不愿安装就输入 <code>n</code>。</li>
-<li>保持网络和终端打开。脚本复用合适的 Python，缺少时下载经 SHA256 核对的项目内 Python；再准备 PDF、音频、Whisper 依赖与模型。不改系统 Python，不上传录音。</li>
-<li>成功后打开浏览器工作台；若未自动打开，手动访问 <a href="http://127.0.0.1:8767/">http://127.0.0.1:8767/</a>。保留服务终端。</li></ol>
-<p>若双击只看到代码：回到 Finder，用“打开方式 → 终端”。或开 Terminal，输入 <code>zsh </code>（末尾空格），把 <code>setup-mac.command</code> 拖进终端，再按回车。不要复制脚本正文当安装指令。</p>
-<h3>Windows：先解压，再运行</h3><ol>
-<li>双击 <code>setup-windows.bat</code>；若看不到扩展名，先在资源管理器开启“文件扩展名”，避免点错。</li>
-<li>出现下载确认时输入 <code>y</code> 并回车。等项目内 Python、依赖与 Whisper 模型安装，不要中途关命令窗口。</li>
-<li>成功后自动启动。没有自动开浏览器时访问 <code>http://127.0.0.1:8767/</code>，并保留命令窗口。</li></ol>
-<div class="callout warning"><strong>系统拦截不是让你关闭安全功能。</strong>Mac .app 只是未签名启动器，不是已公证、完全自包含的桌面软件。若 Gatekeeper、SmartScreen、杀毒软件或 PowerShell 策略拦截，先核实来源并保留准确提示；不要关闭防护、移除隔离标记、运行管理员命令或绕过执行策略。排查时保留完整错误信息。</div>
-<h3>装到一半失败了怎么办？</h3><p>看终端最后几行，不要不断点安装。网络恢复后可重新运行同一 setup，已有依赖标记和缓存可复用，但不保证所有断网都原位续传。若只是模型下载失败，Python 与 PDF 依赖可能已就绪：可尝试 launch 启动阅读、导入和编辑；语音转写要等模型完整。PDF 只有相关依赖装好后才可用。不要删除 <code>.runtime</code> 来“重新安装”。</p>
-<p class="hint">只试基础功能、有现成 Python 3.10+ 时，可直接 launch，不必先装语音模型。完整安装支持 Python 3.10–3.13，主要测试基线是 3.12。安装完成不代表语音推理已实测。</p></section>
+<section id="install"><h2>02 / 首次安装与可选组件</h2>
+<p><strong>默认基础模式。</strong>只需 Python 3.10+，不下载依赖包或语音模型。缺少 Python 时，确认后在项目内下载固定版本并验证校验值；PDF 和语音识别分别按需安装。</p>
+<table><thead><tr><th>菜单选择</th><th>安装内容</th></tr></thead><tbody>
+<tr><td>1 / basic</td><td>仅在缺少 Python 时准备运行环境。可导入、编辑、看示例及导出 Word/TXT，不下载模型。</td></tr>
+<tr><td>2 / pdf</td><td>仅 PDF 依赖，不下载语音模型。</td></tr>
+<tr><td>3 / speech</td><td>CPU Whisper 与音视频工具；未配置语音后端时才下载 small 模型。</td></tr>
+<tr><td>4 / full</td><td>PDF 与语音组件。</td></tr></tbody></table>
+<h3>Mac</h3><ol><li>基础使用直接打开 <code>LectureAtelier.app</code> 或 <code>launch.command</code>。缺 Python 时进入基础运行环境安装，不会因此下载语音模型。</li>
+<li>以后需要 PDF 或本地转写，再打开 <code>setup-mac.command</code>，选模式、阅读下载提示，同意后输入 <code>y</code>。</li>
+<li>脚本若在编辑器打开，可在 Finder 选“打开方式 → 终端”，或在该目录运行 <code>zsh ./setup-mac.command</code>。</li></ol>
+<h3>Windows 10/11 x64</h3><ol><li>基础使用打开 <code>launch-windows.bat</code>；缺 Python 时确认项目内运行环境下载。</li>
+<li>需要 PDF 或语音时打开 <code>setup-windows.bat</code>，在菜单中选择对应模式，并在命令窗口完成安装。</li></ol>
+<p>工作台地址为 <code>http://127.0.0.1:8767/</code>，运行时保留服务终端。已有语音配置（含 MLX 路径）会保留。语音安装可能下载约 0.5–1.5 GB、预留 2–4 GB 磁盘；基础模式不需要这些模型和依赖。</p>
+<div class="callout warning">Mac 启动器未签名。若 Gatekeeper、SmartScreen、杀毒软件或 PowerShell 策略阻止执行，请核实来源并保留准确报错，不关闭防护或绕过执行策略。</div>
+<h3>安装中断</h3><p>检查错误，网络恢复后重跑相同模式，可复用已有缓存。模型失败不影响基础导入和编辑；PDF 需对应依赖。保留 <code>.runtime</code>。可选组件支持 Python 3.10–3.13，测试基线为 3.12；安装成功不等于识别质量已验证。</p></section>
 
 <section id="daily"><h2>03 / 以后怎么开？怎么关？</h2><table><thead><tr><th>你的情况</th><th>操作</th></tr></thead><tbody>
 <tr><td>首次安装已完成</td><td>Mac 双击 <code>launch.command</code>；Windows 双击 <code>launch-windows.bat</code>。不必再次 setup。</td></tr>
@@ -53,7 +55,7 @@
 <li><strong>手工补字：</strong>进入段落校对 / 回听入口，听清后修改。把“转写缺口”补成听到的真实文字，并明确解除缺口；别根据 AI 概括倒填原话。</li>
 <li><strong>局部补转：</strong>异常段用“换策略补转”等入口。进度区显示已处理/总段数、当前段时间、策略次数、累计与本策略用时、可采用/失败/已采用数；不以时间猜测完成比例。候选一生成就有“采用到原文”按钮，点击只替换对应片段并保留记录，仍标未核查；不必等整批结束，其他段继续处理。也可先“回听并比较候选”，再在弹窗采用。失败段没有采用按钮；中断/取消后已生成候选保留。原文被编辑或音频被替换时，过期候选拒绝覆盖。策略次数有限，不会无限重算直到看起来成功；仍失败就保留缺口。</li>
 <li><strong>段落阅读：</strong>只合并呈现，不改来源编号和时间码；逐句纠错可切换 / 展开逐句视图。</li>
-<li><strong>降噪试听：</strong>生成降噪听课版后，在录音版本选择原音 / 处理版。键盘点击抑制是实验选项，可能削弱辅音。默认安装提供 FFmpeg 相关组件，普通使用不必先装 Homebrew；缺组件按准确错误检查。原音不覆盖。</li></ol><p>重复检测不是准确率证明。没有缺口也可能错字、漏掉否定或专名；重要事实必须回听。</p></section>
+<li><strong>降噪试听：</strong>生成降噪听课版后，在录音版本选择原音 / 处理版。键盘点击抑制是实验选项，可能削弱辅音。speech 模式提供 FFmpeg 相关组件，普通使用不必先装 Homebrew；缺组件按准确错误检查。原音不覆盖。</li></ol><p>重复检测不是准确率证明。没有缺口也可能错字、漏掉否定或专名；重要事实必须回听。</p></section>
 
 <section id="api"><h2>06 / 可选：API 三个字段到底填什么？</h2><p>只做本地转写可跳过。需要 AI 校对 / 总结时，在顶部“设置与术语表”找到 <strong>LLM · 结构化笔记</strong>。去所选供应商的<strong>开发者 / API 控制台</strong>查看兼容 Chat Completions 文档、模型列表、费用与 API key；别把聊天网页当 API。</p>
 <table><thead><tr><th>字段</th><th>填法与常见错误</th></tr></thead><tbody><tr><td>API 地址</td><td>供应商给出的 API 根地址，常带 <code>/v1</code>。程序追加 <code>/chat/completions</code>，不要重复填；不是聊天、控制台登录或注册页。</td></tr><tr><td>模型名称</td><td>API 文档中的准确模型 ID，不是品牌名或昵称。网页能聊天不表示账号可调该 API 模型。</td></tr><tr><td>API key</td><td>自己的供应商密钥，不是邮箱密码、验证码或 Notion token。别发朋友或贴公开截图。</td></tr></tbody></table>
@@ -78,7 +80,7 @@ API key：你自己创建的密钥
 <p>校对“原版”是本次校对前快照；“带标记”含已接受与待处理项，不含已拒绝项；“修订版”只用已接受修改。可选 Word、PDF、HTML、Markdown、TXT、JSON；SRT 仅原版 / 修订版。Word 用原生修订，颜色可能受阅读软件设置影响。下载在浏览器下载列表 / 系统“下载”中；本地导出不调用模型。</p>
 <h3>Notion：可选单向导出</h3><ol><li>在“费率与 Notion”点创建 connection 链接，按 Notion 要求创建有写权限的 internal connection / integration，保管 token。</li><li>在目标父页面 Connections 添加它；光有 token 不够。</li><li>回 App 填父页面链接 / ID 和 Connection token。它不是 LLM key，保存本身不发送内容。</li><li>点“发送到 Notion”，核对目标和内容，再确认。每次新建子页面，不双向同步，也不更新以前导出的页。</li><li>上次结果未知 / 部分失败时，先去 Notion 看，再决定重试，以免重复建页。</li></ol><p>只发送总览与详细笔记，不上传录音或整份转写；但笔记可能有原文片段，仍是外发课程 / 会议文本。</p></section>
 
-<section id="data"><h2>09 / 数据在哪？怎么升级与分享？</h2><ul><li><strong>资料：</strong>隐藏的 <code>.runtime</code> 存数据库、上传音频、缓存和私密设置。不要删除它排错，不要发朋友。</li><li><strong>模型 / 依赖：</strong><code>models</code> 存模型，<code>.portable</code> 存项目内环境。ZIP 小是因为首次安装再下载，不是缺文件。</li><li><strong>备份：</strong>等任务结束、Control+C 停服务，再复制完整使用目录，含隐藏项。Mac Finder 用 Command+Shift+句号显示；外部索引原录音 / 原稿另行备份。</li><li><strong>升级：</strong>先备份，新版解压到新目录，不直接覆盖旧版。最稳妥先试空白新版；要迁移资料让熟悉的人 / Codex 检查后迁移 .runtime。它含旧路径与密钥，搬家后须核对模型路径和外部来源，别复制别人的 .runtime。</li><li><strong>分享：</strong>发干净发行 ZIP，不随手压缩已用目录。自己的 JSON、Word、诊断与截图可能有隐私，另行检查。</li><li><strong>不是共享网站：</strong><code>127.0.0.1</code> 指当前这台电脑。发这个地址不共享数据，程序只绑定本机，不要改为公网监听。</li></ul><p>许可证见 <code>THIRD-PARTY-NOTICES.txt</code>；<code>SHA256SUMS.txt</code> 是完整性校验，不是数字签名或安全审计。</p></section>
+<section id="data"><h2>09 / 数据在哪？怎么升级与分享？</h2><ul><li><strong>资料：</strong>隐藏的 <code>.runtime</code> 存数据库、上传音频、缓存和私密设置。不要删除它排错，不要发朋友。</li><li><strong>模型 / 依赖：</strong><code>models</code> 存模型，<code>.portable</code> 存项目内环境。运行环境及可选模型按所选模式另行下载。</li><li><strong>备份：</strong>等任务结束、Control+C 停服务，再复制完整使用目录，含隐藏项。Mac Finder 用 Command+Shift+句号显示；外部索引原录音 / 原稿另行备份。</li><li><strong>升级：</strong>先备份，新版解压到新目录，不直接覆盖旧版。最稳妥先试空白新版；要迁移资料让熟悉的人 / Codex 检查后迁移 .runtime。它含旧路径与密钥，搬家后须核对模型路径和外部来源，别复制别人的 .runtime。</li><li><strong>分享：</strong>发干净发行 ZIP，不随手压缩已用目录。自己的 JSON、Word、诊断与截图可能有隐私，另行检查。</li><li><strong>不是共享网站：</strong><code>127.0.0.1</code> 指当前这台电脑。发这个地址不共享数据，程序只绑定本机，不要改为公网监听。</li></ul><p>许可证见 <code>THIRD-PARTY-NOTICES.txt</code>；<code>SHA256SUMS.txt</code> 是完整性校验，不是数字签名或安全审计。</p></section>
 
 <section id="trouble"><h2>10 / 故障排查：先定位，再操作</h2>
 <details open><summary>点 launch 只显示代码 / 页面是 file://</summary><p>在 Finder / 资源管理器运行脚本，不是在聊天里预览源代码；Mac 可用“打开方式 → 终端”。只有入口和手册可直接双击静态 HTML。工作台应是 http://127.0.0.1:8767/，不是 static/index.html。</p></details>

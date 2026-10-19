@@ -1,0 +1,43 @@
+name: Bug report / 功能问题
+description: Report a reproducible application problem using non-sensitive examples.
+body:
+  - type: markdown
+    attributes:
+      value: "Do not attach API keys, recordings, transcripts, private paths or .runtime. Use fictional examples and redact logs. / 请勿上传密钥、录音、原文、私人路径或运行目录。"
+  - type: input
+    id: version
+    attributes:
+      label: App version or commit
+      placeholder: 0.1.0-alpha.1
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS, architecture and browser
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include the selected setup profile and feature. Use a small fictional sample.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Redacted error message or screenshot
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I removed credentials and private content from this report.
+          required: true

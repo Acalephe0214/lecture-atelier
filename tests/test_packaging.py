@@ -2,6 +2,7 @@
 import hashlib
 import http.client
 import json
+import os
 from pathlib import Path
 import signal
 import socket
@@ -105,10 +106,17 @@ class FriendPackageTests(unittest.TestCase):
             for service in ("llm","asr"):
                 self.assertFalse(payload["settings"][service]["configured"])
                 self.assertNotIn("api_key",payload["settings"][service])
-            process.send_signal(signal.SIGINT)
+            if os.name == "nt":
+                # Windows pipes do not deliver POSIX SIGINT; terminate the owned child.
+                process.terminate()
+            else:
+                process.send_signal(signal.SIGINT)
             log,_ = process.communicate(timeout=8)
-            self.assertEqual(process.returncode,0,log)
-            self.assertIn("已停止",log)
+            if os.name != "nt":
+                self.assertEqual(process.returncode,0,log)
+                self.assertIn("已停止",log)
+            else:
+                self.assertIsNotNone(process.returncode)
         finally:
             if process.poll() is None:
                 process.terminate()

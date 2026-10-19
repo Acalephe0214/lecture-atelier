@@ -197,7 +197,8 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertTrue(settings["llm"]["configured"])
         self.assertNotIn(sentinel, json.dumps(settings))
-        self.assertEqual(stat.S_IMODE((Path(self.temp.name) / "settings.json").stat().st_mode), 0o600)
+        if os.name != "nt":
+            self.assertEqual(stat.S_IMODE((Path(self.temp.name) / "settings.json").stat().st_mode), 0o600)
         self.call("PUT", "/api/settings", {"llm": {"api_key": ""}})
         self.assertEqual(self.server.store.private_settings()["llm"]["api_key"], sentinel)
         self.call("PUT", "/api/settings", {"llm": {"clear_key": True}})

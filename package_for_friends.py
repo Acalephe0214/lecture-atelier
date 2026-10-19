@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent
 LICENSE_FILES = ("LICENSE", "licenses/README.md", "licenses/openai-whisper-LICENSE", "licenses/faster-whisper-LICENSE",
     "licenses/ctranslate2-LICENSE", "licenses/mlx-LICENSE", "licenses/pyav-LICENSE.txt", "licenses/imageio-ffmpeg-LICENSE", "licenses/reportlab-LICENSE")
 FILES = (
+    "VERSION", "CHANGELOG.md",
     "app.py", "store.py", "local_sources.py", "index_local_course.py",
     "local_transcription.py", "local_repair.py", "asr_checkpoints.py", "audio_processing.py", "note_jobs.py",
     "launch.command", "setup-mac.command", "launch-windows.bat", "requirements.txt", "requirements-whisper-mac.txt",
@@ -20,7 +21,7 @@ FILES = (
     "static/index.html", "static/app.js", "static/style.css", "static/playback.js", "static/paragraphs.js", "static/i18n.js", "static/i18n-en.js", "static/panels.js", "static/favicon.svg",
     "core/usage_estimate.py", "core/delivery.py", "core/pdf_export.py", "core/notion_export.py", "core/local_engine.py",
     "static/delivery.js", "bootstrap.py", "bootstrap-mac.command", "bootstrap-windows.ps1", "portable_runtime.json",
-    "setup-windows.bat", "requirements-portable.txt", "THIRD-PARTY-NOTICES.txt",
+    "setup-windows.bat", "requirements-portable.txt", "requirements-pdf.txt", "requirements-speech.txt", "THIRD-PARTY-NOTICES.txt",
     "LectureAtelier.app/Contents/Info.plist", "LectureAtelier.app/Contents/MacOS/Launch",
     "SHARE-WITH-FRIEND.txt",
     "core/redline.py", "core/proofread_export.py", "core/paragraphs.py", "correction_jobs.py", "static/revisions.js",

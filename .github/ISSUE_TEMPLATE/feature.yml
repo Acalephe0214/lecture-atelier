@@ -1,0 +1,16 @@
+name: Feature request / 使用需求
+description: Describe a real workflow and the obstacle you encountered.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Workflow and problem
+      description: Describe the task without sharing private course or meeting content.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired result and current workaround
+    validations:
+      required: true

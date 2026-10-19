@@ -1,5 +1,6 @@
 """Regression checks for repetition, finite retry, time bounds and checkpoint privacy."""
 import json
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -133,7 +134,8 @@ class CheckpointTests(unittest.TestCase):
         data = {"version": VERSION, "duration": 120, "chunks": {"0": {"segments": [], "issues": [], "start": 0, "end": 60}}}
         self.cache.save(key, data)
         self.assertEqual(self.cache.load(key), data)
-        self.assertEqual(self.cache.path(key).stat().st_mode & 0o777, 0o600)
+        if os.name != "nt":
+            self.assertEqual(self.cache.path(key).stat().st_mode & 0o777, 0o600)
         self.assertNotEqual(key, self.cache.key("lecture", "source-two", self.config))
         self.assertNotEqual(key, self.cache.key("lecture", "source-one", {**self.config, "language": "fr"}))
         (self.model / "weights.npz").write_bytes(b"replaced-model")

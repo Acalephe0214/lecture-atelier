@@ -10,8 +10,10 @@ from package_for_friends import FILES as APP_FILES, check_public_content
 
 ROOT = Path(__file__).resolve().parent
 PUBLIC_DOCS = ("README.md", "README.zh-CN.md", "PRIVACY.md", "SECURITY.md", "requirements-dev.txt", ".gitattributes",
-    "docs/ARCHITECTURE.md", "docs/VERIFICATION.md", "docs/ROADMAP.md", "docs/PUBLISHING.md", "docs/images/workspace.png",
-    ".github/workflows/checks.yml", "examples/import_demo.srt", "examples/untimed_demo.txt")
+    "docs/ARCHITECTURE.md", "docs/VERIFICATION.md", "docs/ROADMAP.md", "docs/PUBLISHING.md", "docs/TRY-IT.md", "docs/images/workspace.png",
+    ".github/workflows/checks.yml", ".github/ISSUE_TEMPLATE/bug.yml", ".github/ISSUE_TEMPLATE/installation.yml",
+    ".github/ISSUE_TEMPLATE/feature.yml", ".github/ISSUE_TEMPLATE/config.yml",
+    "examples/import_demo.srt", "examples/untimed_demo.txt")
 PUBLIC_TESTS = (
     "tests/test_acceptance.py", "tests/test_asr_guard.py", "tests/test_audio_processing.py", "tests/test_clean_workspace.py",
     "tests/test_connectors.py", "tests/test_delivery.py", "tests/test_diagnostic_catalog.py", "tests/test_end_to_end_audit.py",
@@ -19,7 +21,7 @@ PUBLIC_TESTS = (
     "tests/test_mixed_asr.py", "tests/test_note_jobs.py", "tests/test_output_language.py", "tests/test_overview_recovery.py",
     "tests/test_packaging.py", "tests/test_pipeline.py", "tests/test_quicktime.py", "tests/test_reading_transcript.py",
     "tests/test_redline.py", "tests/test_server.py", "tests/test_setup_check.py", "tests/test_video_prepare.py",
-    "tests/test_workflow.py", "tests/test_workflow_audit.py", "tests/test_source_release.py",
+    "tests/test_workflow.py", "tests/test_workflow_audit.py", "tests/test_source_release.py", "tests/test_bootstrap_profiles.py",
     "tests/test_i18n.cjs", "tests/test_paragraphs.cjs", "tests/test_playback.cjs", "tests/test_panels.cjs")
 SOURCE_FILES = tuple(dict.fromkeys((*APP_FILES, "package_for_friends.py", "prepare_github.py", *PUBLIC_DOCS, *PUBLIC_TESTS)))
 

@@ -19,7 +19,7 @@ class SourceReleaseTests(unittest.TestCase):
             target=Path(folder).resolve()/"source";archive=Path(folder).resolve()/"source.zip"
             result=release.build(target,archive)
             self.assertFalse(result["uploaded"]);self.assertFalse(result["git_initialized"])
-            actual={str(path.relative_to(target)) for path in target.rglob("*") if path.is_file()}
+            actual={path.relative_to(target).as_posix() for path in target.rglob("*") if path.is_file()}
             self.assertEqual(actual,set(release.SOURCE_FILES)|{"SOURCE-MANIFEST.json"})
             with zipfile.ZipFile(archive) as package:
                 self.assertEqual(set(package.namelist()),{"lecture-atelier/"+name for name in actual})

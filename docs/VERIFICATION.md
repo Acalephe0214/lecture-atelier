@@ -30,7 +30,9 @@ node tests/test_playback.cjs
 node tests/test_panels.cjs
 ```
 
-Integration tests require loopback listeners. Optional dependencies are not installed by the tests; unavailable components are reported as skips. [GitHub Actions](https://github.com/Acalephe0214/lecture-atelier/actions/workflows/checks.yml) runs the software checks on Linux with Python 3.12 and Node.js 22.
+Integration tests require loopback listeners. Optional dependencies are not installed by the tests; unavailable components are reported as skips. [GitHub Actions](https://github.com/Acalephe0214/lecture-atelier/actions/workflows/checks.yml) targets Linux, macOS and Windows with Python 3.12 and Node.js 22, including no-model basic setup checks on Mac and Windows. Current job results, not the matrix definition, establish which checks passed.
+
+Hosted-runner checks do not establish clean end-user installation, OS security prompts, real speech quality or browser usability. Independent first-use trials are tracked separately using [TRY-IT.md](TRY-IT.md). POSIX file-mode checks apply only on POSIX; Windows file ACLs require separate validation.
 
 ## Next quality-evaluation work
 

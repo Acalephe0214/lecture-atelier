@@ -9,7 +9,7 @@ for lecture_candidate in "$PWD/.portable/python/bin/python3" "$PWD/.venv/bin/pyt
   fi
 done
 if [ -z "$lecture_python" ]; then
-  exec /bin/zsh ./bootstrap-mac.command
+  exec /bin/zsh ./bootstrap-mac.command --profile basic
 fi
 if [ -d "$PWD/.portable/vendor" ]; then
   export PYTHONPATH="$PWD/.portable/vendor${PYTHONPATH:+:$PYTHONPATH}"
@@ -17,8 +17,7 @@ if [ -d "$PWD/.portable/vendor" ]; then
 fi
 printf '%s\n' '正在启动「听课之间」，请保留此终端窗口。'
 printf '%s\n' 'Starting Lecture Atelier. Keep this Terminal open. Choose English / 中文 in the app header.'
-printf '%s\n' '停止：先点击此终端，再按 Control+C（⌃C），不是 Command+C（⌘C，复制）。'
-printf '%s\n' 'To stop: click this Terminal, then Control+C (⌃C), not Command+C (copy).'
+printf '%s\n' '停止 / Stop: Control+C in this terminal.'
 printf '%s\n' '服务运行时可直接打开 http://127.0.0.1:8767，不必重复启动；停止后再次启动会保留数据。'
 exec "$lecture_python" app.py --open
 

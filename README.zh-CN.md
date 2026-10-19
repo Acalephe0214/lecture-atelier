@@ -29,13 +29,20 @@ python3 app.py --open
 
 浏览器地址为 <http://127.0.0.1:8767/>。Windows 可用 `py -3 app.py --open` 或 `launch-windows.bat`。应用内提供虚构示例。
 
-### 本地识别与 PDF
+### 按需安装
 
-Mac 使用 `setup-mac.command`；Windows 10/11 x64 使用 `setup-windows.bat`。安装器在项目目录准备依赖和多语言 Whisper small 模型，预留约 2–4 GB；首次需联网。
+Mac 使用 `setup-mac.command`；Windows 10/11 x64 使用 `setup-windows.bat`。菜单默认选择基础模式，下载前确认。
 
-默认后端为 CPU faster-whisper，Apple Silicon 也可使用已有的 MLX Whisper 配置。
+| 模式 | 安装内容 |
+| --- | --- |
+| `basic` | 仅在缺少 Python 时下载运行环境，不下载依赖包或语音模型 |
+| `pdf` | PDF 导出依赖，不下载语音模型 |
+| `speech` | CPU Whisper 与音频工具；未配置语音后端时才下载模型 |
+| `full` | PDF 与语音组件 |
 
-详细安装与操作见 [中文手册](FRIEND-GUIDE.html) 或 [English guide](FRIEND-GUIDE-EN.html)。
+语音安装可能需下载约 0.5–1.5 GB、预留 2–4 GB 磁盘。已有语音配置（包括 Apple Silicon MLX 路径）会保留；Mac 启动器不再以模型安装完成作为打开应用的前提。
+
+详细步骤见 [中文手册](FRIEND-GUIDE.html)、[English guide](FRIEND-GUIDE-EN.html) 或 [首次试用](docs/TRY-IT.md)。
 
 ## API、隐私和限制
 

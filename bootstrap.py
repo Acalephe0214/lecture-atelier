@@ -1,4 +1,4 @@
-"""Recipient-side installer. Downloads only after --install; no system changes."""
+"""Project-local optional components. Basic mode never installs packages or models."""
 from __future__ import annotations
 import argparse
 import hashlib
@@ -14,6 +14,19 @@ ROOT = Path(__file__).resolve().parent
 VENDOR = ROOT / ".portable" / "vendor"
 MODEL = ROOT / "models" / "faster-whisper-small"
 REPO = "Systran/faster-whisper-small"
+PROFILES = ("basic", "pdf", "speech", "full")
+
+
+def existing_asr():
+    """Inspect configured paths without opening a database or displaying secrets."""
+    settings = ROOT / ".runtime" / "settings.json"
+    if not settings.is_file():
+        return False
+    try:
+        value = json.loads(settings.read_text(encoding="utf-8"))
+        return bool(value.get("local_asr", {}).get("model_path"))
+    except (OSError, ValueError, AttributeError):
+        raise ValueError("Existing settings could not be read; left unchanged. Check .runtime/settings.json.") from None
 
 
 def bundled_configure():
@@ -27,7 +40,7 @@ def bundled_configure():
     store = Store(ROOT / ".runtime")
     existing = store.private_settings()["local_asr"]
     if existing.get("model_path"):
-        # Existing working setups, including the author's MLX config, win.
+        # Retain any explicitly configured backend, including external MLX paths.
         return True
     config = checked_config({"backend": "faster", "model_path": str(MODEL), "python_path": sys.executable, "language": "auto"})
     store.update_settings({"local_asr": config})
@@ -50,22 +63,18 @@ def collect_licenses(target=ROOT / ".portable" / "licenses"):
     (target / "installed-packages.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 
 
-def install():
-    if not (3, 10) <= sys.version_info[:2] < (3, 14):
-        raise ValueError("Please use Python 3.10–3.13 (3.12 tested).")
-    if VENDOR.is_symlink() or (ROOT / ".portable").is_symlink() or MODEL.is_symlink():
-        raise ValueError("Installation paths cannot be symbolic links.")
-    VENDOR.mkdir(parents=True, exist_ok=True)
-    os.environ["PYTHONPATH"] = str(VENDOR)
-    sys.path.insert(0, str(VENDOR))
-    ready = VENDOR / ".requirements-sha256"
-    requirements = ROOT / "requirements-portable.txt"
+def install_component(component):
+    requirements = ROOT / ("requirements-" + component + ".txt")
+    ready = VENDOR / (".requirements-" + component + "-sha256")
     digest = hashlib.sha256(requirements.read_bytes()).hexdigest()
     if not ready.is_file() or ready.read_text().strip() != digest:
-        print('1/3 · Installing isolated PDF / CPU Whisper dependencies from PyPI…', flush=True)
+        print("Installing project-local " + component + " dependencies from PyPI…", flush=True)
         subprocess.run([sys.executable, "-m", "pip", "install", "--disable-pip-version-check", "--only-binary=:all:", "--index-url", "https://pypi.org/simple", "--target", str(VENDOR), "--upgrade", "-r", str(requirements)], check=True)
         ready.write_text(digest)
-    print('2/3 · Checking / downloading multilingual Whisper small (~0.5 GB). Progress below; existing Hugging Face cache can resume.', flush=True)
+
+
+def download_model():
+    print('Checking multilingual Whisper small (~0.5 GB); existing download caches are reused.', flush=True)
     from huggingface_hub import snapshot_download, HfApi
     # Downloading fixed repo files only; never trust_remote_code, no executable
     # model code. Store the resolved revision and every file digest for audit.
@@ -74,7 +83,7 @@ def install():
             revision = HfApi().model_info(REPO, token=False, timeout=15).sha
             snapshot_download(repo_id=REPO, revision=revision, token=False, etag_timeout=15, local_dir=str(MODEL), allow_patterns=["model.bin", "config.json", "tokenizer.json", "vocabulary.*", "preprocessor_config.json", "README.md", "LICENSE*"])
         except Exception:
-            print('Model download did not complete. Check access to https://huggingface.co/Systran/faster-whisper-small ; rerun setup to resume. No unofficial mirror is used. PDF / import / editing still work via launch.command or launch-windows.bat.', flush=True)
+            print('Model download did not complete. Check https://huggingface.co/Systran/faster-whisper-small and rerun the speech profile. Basic import/editing still work via launch.command or launch-windows.bat.', flush=True)
             return False
         files = {}
         for file in MODEL.iterdir():
@@ -85,20 +94,51 @@ def install():
                         digest_file.update(chunk)
                 files[file.name] = digest_file.hexdigest()
         (MODEL / "model-manifest.json").write_text(json.dumps({"repo": REPO, "revision": revision, "license": "MIT", "downloaded_at": time.time(), "sha256": files}, indent=2))
-    print('3/3 · Saving local paths and collecting dependency licenses…', flush=True)
-    collect_licenses()
     bundled_configure()
-    print('Ready. No recordings uploaded. No paid APIs called. Open launch.command (Mac) or launch-windows.bat (Windows).', flush=True)
+    return True
+
+
+def install(profile="basic"):
+    if profile not in PROFILES:
+        raise ValueError("Unknown setup profile.")
+    if sys.version_info[:2] < (3, 10):
+        raise ValueError("Python 3.10 or later is required.")
+    if profile == "basic":
+        print('Basic app ready. No packages or speech model were downloaded.', flush=True)
+        return True
+    if sys.version_info[:2] >= (3, 14):
+        raise ValueError("Optional components require Python 3.10–3.13 (3.12 tested).")
+    paths = (ROOT / ".portable", VENDOR, ROOT / ".portable" / "licenses", ROOT / "models", MODEL)
+    if any(path.is_symlink() for path in paths):
+        raise ValueError("Installation paths cannot be symbolic links.")
+    retained = existing_asr() if profile in {"speech", "full"} else False
+    components = (["pdf"] if profile in {"pdf", "full"} else [])
+    if profile in {"speech", "full"} and not retained:
+        components.append("speech")
+    if components:
+        VENDOR.mkdir(parents=True, exist_ok=True)
+        os.environ["PYTHONPATH"] = str(VENDOR)
+        sys.path.insert(0, str(VENDOR))
+        for component in components:
+            install_component(component)
+        # Preserve dependency notices even when a later model download fails.
+        collect_licenses()
+    if retained:
+        print('Existing speech configuration retained; no replacement model downloaded. Check it in Settings.', flush=True)
+    elif profile in {"speech", "full"} and not download_model():
+        return False
+    print('Setup ready. No recordings uploaded. No paid APIs called.', flush=True)
     return True
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--install", action="store_true")
+    parser.add_argument("--profile", choices=PROFILES, default="basic")
     parser.add_argument("--configure-bundled", action="store_true")
     args = parser.parse_args()
     if args.install:
-        if not install():
+        if not install(args.profile):
             sys.exit(2)
     elif args.configure_bundled:
         bundled_configure()

@@ -1,6 +1,3 @@
-# Local-only CPU Whisper + PDF. No CUDA, no cloud account needed.
-faster-whisper==1.2.1
-reportlab==4.4.10
-# This wheel contains an FFmpeg executable; downloaded by each recipient,
-# never copied out of the author's machine. See THIRD-PARTY-NOTICES.txt.
-imageio-ffmpeg==0.6.0
+# Combined optional components. Individual installers use the separate profiles.
+-r requirements-pdf.txt
+-r requirements-speech.txt

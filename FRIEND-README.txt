@@ -7,10 +7,10 @@ Lecture Atelier / 听课之间
 2. 双击 START-HERE.html，用浏览器阅读入口。
    完整中文手册：FRIEND-GUIDE.html
    Complete English manual: FRIEND-GUIDE-EN.html
-3. Mac 首次双击 setup-mac.command；Windows 10/11 x64 双击 setup-windows.bat。
-   出现 [y/N] 后，确认信任来源、愿意下载，再输入 y 并按回车。
-   首次约下载 0.5–1.5 GB，预留 2–4 GB；需 GitHub / PyPI / Hugging Face 可达。
-   安装器在项目内准备 Python、PDF/音频依赖和多语言 Whisper small 模型。
+3. Mac 可打开 .app / launch.command；Windows 10/11 x64 打开 launch-windows.bat。
+   缺 Python 时确认项目内运行环境下载；已有 Python 时基础模式无需下载。
+   需要 PDF 或语音时运行 setup，选 2/pdf、3/speech 或 4/full，默认 1/basic。
+   PDF 不下载语音模型；语音模式可能下载 0.5–1.5 GB、需 2–4 GB 磁盘。
    无需管理员权限，本地处理不需要 API key，也不上传录音。
 4. 成功后打开 http://127.0.0.1:8767/，保留服务终端；没自动打开就手动访问。
 5. 先用“探索虚构示例”，再用 30–60 秒的授权录音测试。
@@ -31,15 +31,15 @@ MP4 / MOV / WEBM 本地转写先提取并缓存 16 kHz 单声道 WAV，之后再
 
 哪些功能需要联网 / 密钥：
 导入、阅读、手工校对、已装好的本地 Whisper、降噪和本地导出不需模型 API。
-首次下载依赖和权重需联网；PDF 需相应依赖，Word 不额外依赖 PDF 工具。
+可选组件下载依赖和权重时需联网；PDF 需相应依赖，Word 不额外依赖 PDF 工具。
 AI 校对 / 总结需要自己的兼容 Chat Completions API，可能收费、逐次确认。
 Notion 需要自己的 connection token 和有权限的父页面，不是 LLM API key。
 详见手册“API 三个字段”“校对与总结”“导出与 Notion”“故障排查”。
 
 English quick path:
 Unzip → START-HERE.html → FRIEND-GUIDE-EN.html.
-First run: setup-mac.command (Mac) or setup-windows.bat (Windows x64).
-Approve project-local downloads with y + Return only after reviewing the source.
+Basic: launch.command (Mac) or launch-windows.bat (Windows x64).
+For optional components, run setup and select basic, pdf, speech or full. Review download consent.
 Later: launch.command / launch-windows.bat. Keep Terminal open; stop with Control+C.
 Installed local transcription needs no paid API. AI proofreading and summaries
 require your own provider endpoint, model ID and API key.
@@ -88,5 +88,5 @@ length is unknown. Estimates are not caps; blocked tasks are not zero-cost quote
 这是首次联网安装包，不是预装模型的离线 .app/.exe。
 Mac .app 只是未签名启动器，不可单独移出；不关闭防护或移除隔离。
 Windows x64 脚本已提供，但未经 Windows 真机验证；Windows ARM64 不在范围。
-默认跨平台 CPU faster-whisper；已有 Apple Silicon MLX 配置保留，不强制改装。
+语音模式提供跨平台 CPU faster-whisper；已有 Apple Silicon MLX 配置保留。
 许可证与来源：THIRD-PARTY-NOTICES.txt。校验清单不是数字签名或安全审计。

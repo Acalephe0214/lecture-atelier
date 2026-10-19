@@ -30,6 +30,7 @@ from core import redline
 from correction_jobs import CorrectionJobs
 
 ROOT = Path(__file__).resolve().parent
+APP_VERSION = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
 MAX_JSON = 8 * 1024 * 1024
 MAX_AUDIO = 2 * 1024 * 1024 * 1024  # Local streamed upload; cloud gateway keeps its own 120 MiB cap.
 REVIEWS = {"unreviewed", "verified", "needs_review"}
@@ -238,7 +239,7 @@ class Handler(BaseHTTPRequestHandler):
             query = parse_qs(parsed_url.query)
             store = self.server.store
             if method == "GET" and path == "/api/health":
-                return self._json({"ok": True})
+                return self._json({"ok": True, "version": APP_VERSION})
             if method == "GET" and path in {"/help", "/FRIEND-GUIDE.html", "/FRIEND-GUIDE-EN.html", "/START-HERE.html"}:
                 if path == "/help":
                     filename = "FRIEND-GUIDE-EN.html" if query.get("ui") == ["en"] else "FRIEND-GUIDE.html"

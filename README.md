@@ -29,14 +29,21 @@ python3 app.py --open
 
 The app opens at <http://127.0.0.1:8767/>. On Windows, use `py -3 app.py --open` or `launch-windows.bat`. A built-in fictional demo is available.
 
-### Optional local speech and PDF setup
+### Setup profiles
 
-- Mac: run `setup-mac.command` from Finder, or `/bin/zsh ./setup-mac.command`.
-- Windows 10/11 x64: run `setup-windows.bat`.
-- Setup downloads project-local dependencies and a multilingual Whisper small model; allow roughly 2–4 GB disk space and initial network access.
-- CPU faster-whisper is the default backend. Apple Silicon can also use an existing MLX Whisper configuration.
+Mac: open `setup-mac.command`. Windows 10/11 x64: open `setup-windows.bat`.
+The setup menu defaults to **basic**; downloads require confirmation.
 
-Detailed installation and usage: [English guide](FRIEND-GUIDE-EN.html) · [Chinese guide](FRIEND-GUIDE.html).
+| Profile | Installs |
+| --- | --- |
+| `basic` | Python only if missing; no packages or speech model |
+| `pdf` | PDF export dependencies; no speech model |
+| `speech` | CPU Whisper and media tools; downloads a model only when no speech backend is configured |
+| `full` | PDF and speech components |
+
+Speech setup may need 0.5–1.5 GB downloads and 2–4 GB disk. Existing speech settings, including Apple Silicon MLX paths, are retained. The Mac launcher opens the basic app independently of model installation.
+
+Detailed installation and usage: [English guide](FRIEND-GUIDE-EN.html) · [Chinese guide](FRIEND-GUIDE.html) · [First-use trial](docs/TRY-IT.md).
 
 ### Optional AI notes and Notion
 

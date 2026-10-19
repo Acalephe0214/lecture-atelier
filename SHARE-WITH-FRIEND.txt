@@ -3,10 +3,10 @@ Lecture Atelier（听课之间）· 快速开始
 本地录音转写、校对和笔记工具。
 1. 完整解压 ZIP，先打开 START-HERE.html，再按“完整中文手册”或
    “Complete English manual”阅读。前四节是解压、安装、启动和第一段录音。
-2. Mac 双击 setup-mac.command；Windows 10/11 x64 双击 setup-windows.bat。
-3. 第一次输入 y 同意下载，程序会在项目内安装 Python、Whisper 和 PDF
-   依赖，再下载多语言模型。约 0.5–1.5 GB，留 2–4 GB 空间，需要能连接
-   GitHub / PyPI / Hugging Face。不上传录音，不需要管理员权限或 API key。
+2. Mac 打开 .app / launch.command；Windows x64 打开 launch-windows.bat。
+3. 基础模式不装依赖包或模型；仅在缺 Python 时确认运行环境下载。
+   以后需要 PDF 或语音再打开 setup，选 2/pdf、3/speech 或 4/full。
+   语音模式可能下载 0.5–1.5 GB、需 2–4 GB 磁盘；已有语音配置会保留。
 4. 以后 Mac 双击 launch.command，Windows 双击 launch-windows.bat。
    在运行服务的终端按 Control+C 停止程序。
 5. 转写是本地的；AI 校对/总结需要你自己的模型 API，Notion 也需你自己的

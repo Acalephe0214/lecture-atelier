@@ -10,17 +10,16 @@ folder. Do not disable Gatekeeper, remove quarantine or bypass PowerShell policy
    available Python if possible. Never overwrite .runtime or existing MLX paths.
 2. Basic app requires only Python 3.10+. It can start with launch.command (Mac)
    or launch-windows.bat (Windows). No external model call is needed for it.
-3. For the complete PDF/local speech setup, obtain approval for ~0.5–1.5 GB of
-   downloads and 2–4 GB disk. Run setup-mac.command or setup-windows.bat from the
-   extracted folder. Confirm y at the prompt only after the human authorizes it.
-   The Mac bootstrap reuses a compatible Python or downloads pinned, SHA256-
-   verified python-build-standalone. Windows x64 downloads the same project's
-   pinned Windows Python. Both install into .portable/vendor, not system Python.
-4. bootstrap.py --install installs requirements-portable.txt from PyPI, downloads
-   multilingual Systran/faster-whisper-small from official Hugging Face, collects
-   wheel licenses and configures CPU faster-whisper ONLY if no local ASR model
-   is configured. It does not upload audio or call paid APIs. Existing MLX paths
-   win. No CUDA required. Inference uses local_files_only; no hidden downloads.
+3. Setup defaults to basic: no dependency packages or speech model. It reuses a
+   supported Python, or asks before downloading a pinned, SHA256-verified project
+   runtime. Mac: setup-mac.command. Windows x64: setup-windows.bat. The menu also
+   offers pdf, speech and full profiles. PDF alone must not install Whisper.
+4. bootstrap.py --install --profile pdf installs requirements-pdf.txt. The speech
+   profile uses requirements-speech.txt and downloads multilingual Whisper small
+   only if no local speech backend is already configured. Full selects both.
+   Existing paths/settings are retained. Speech may need 0.5–1.5 GB downloads and
+   2–4 GB disk; get approval before optional downloads. No audio upload or paid
+   API is involved. Dependencies remain in .portable/vendor, not system Python.
 5. Hugging Face must be reachable. Download failure leaves basic import/edit/PDF
    available; explain the error and rerun to resume. Never change to an unapproved
    mirror. Check the downloaded manifest and test a short synthetic recording
@@ -36,6 +35,13 @@ folder. Do not disable Gatekeeper, remove quarantine or bypass PowerShell policy
 
 The remaining sections document the original basic/MLX manual path for users
 who already have that environment; they are NOT the only available ASR backend.
+
+For an explicitly approved non-interactive check without starting the server:
+Mac: `zsh setup-mac.command --profile basic --yes --no-launch`.
+Windows: `powershell -NoProfile -File bootstrap-windows.ps1 -Profile basic -Yes -NoLaunch`.
+`--yes` / `-Yes` records prior download consent; do not supply it without approval.
+Choose pdf, speech or full explicitly only when requested. Inference is strictly
+local after setup; no hidden model download occurs during transcription.
 
 ## Mixed recording languages
 
