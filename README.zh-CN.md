@@ -2,7 +2,7 @@
 
 一个本地录音、文字稿与可追溯笔记工作台。
 
-[English](README.md) · [完整中文手册](FRIEND-GUIDE.html) · [架构说明](docs/ARCHITECTURE.md) · [验证范围](docs/VERIFICATION.md) · [路线图](docs/ROADMAP.md)
+[English](README.md) · [下载版本](https://github.com/Acalephe0214/lecture-atelier/releases) · [完整中文手册](FRIEND-GUIDE.html) · [架构说明](docs/ARCHITECTURE.md) · [验证范围](docs/VERIFICATION.md) · [路线图](docs/ROADMAP.md)
 
 ![虚构材料演示：原文与结构化笔记](docs/images/workspace.png)
 
@@ -50,7 +50,7 @@ AI 校对和总结需在设置中填写兼容 Chat Completions 的 API 根地址
 
 录音和应用数据保存在本地；选择外部功能时，相应文字或录音会发送到指定服务。API 密钥保存在本地配置中，未做应用层加密。详见 [隐私说明](PRIVACY.md)。
 
-转写与总结需人工核查。文字校对依赖文字上下文而非录音，原文引用也不保证语义准确；token 和价格为近似预估。现有软件测试主要使用合成材料和模拟接口，尚无公开的转写／总结质量基准；Windows 脚本尚未经 Windows 真机验证，不支持 Windows ARM64。见 [验证范围](docs/VERIFICATION.md)。
+转写与总结需人工核查。文字校对依赖文字上下文而非录音，原文引用也不保证语义准确；token 和价格为近似预估。现有软件测试主要使用合成材料和模拟接口，尚无公开的转写／总结质量基准。Linux、macOS、Windows 托管 CI 已通过，包括已有 Python 的基础安装；全新 Windows 用户安装及语音依赖安装仍待验证，不支持 Windows ARM64。见 [验证范围](docs/VERIFICATION.md)。
 
 辅助课件和个人笔记上传列入后续计划，见 [路线图](docs/ROADMAP.md)。
 

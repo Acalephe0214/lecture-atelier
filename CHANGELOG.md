@@ -8,6 +8,7 @@ First versioned alpha distribution.
 - Mac launcher starts the basic application independently of optional model installation.
 - Retain configured speech backends and collect dependency notices before model downloads.
 - Close SQLite backup handles explicitly and avoid reverse-DNS lookups during loopback startup.
+- Add cross-platform software checks, installation-report templates and an offline human-reference scoring protocol.
 - Provide transcript review, local Whisper, source-linked AI notes, exports and optional Notion delivery.
 
 Platform checks and remaining manual-validation work are listed in the repository's [verification document](https://github.com/Acalephe0214/lecture-atelier/blob/codex/initial-publication/docs/VERIFICATION.md).

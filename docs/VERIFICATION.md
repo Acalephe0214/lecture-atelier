@@ -8,7 +8,16 @@ Synthetic tests cover transcript parsing, real/unknown timestamps, source-refere
 
 Some integration checks run a loopback simulated SSE model. They exercise the application pipeline and transport, but their answers are constructed fixtures: they do not measure an LLM's reasoning or fidelity. Notion writes are mocked. Audio/video checks use synthetic samples; some require FFmpeg. PDF checks require optional libraries and may skip when unavailable.
 
-Local development has also included an English synthetic-speech smoke test with an existing Whisper model and a checkpoint rerun. That demonstrates one setup path, not multilingual accuracy. Browser checks performed during development do not establish Windows compatibility. Windows hardware, broad language combinations, real classroom noise and summary quality remain unvalidated.
+Local development has also included an English synthetic-speech smoke test with an existing Whisper model and a checkpoint rerun. That demonstrates one setup path, not multilingual accuracy. Browser checks performed during development do not establish Windows compatibility. Clean end-user Windows setup, broad language combinations, noise-reduction quality and summary quality remain unvalidated.
+
+## Recorded validation — 2026-10-19
+
+- [Cross-platform run at b6f918d](https://github.com/Acalephe0214/lecture-atelier/actions/runs/39242163440): Linux, macOS and Windows jobs passed. Mac and Windows exercised basic setup with the hosted runner's existing Python; this did not test runtime downloads or optional speech installation.
+- Local regression run at the same revision: 319 Python tests passed. The buildless JavaScript checks also passed. Test counts include synthetic/mocked checks, not quality samples.
+- A private local study decoded eight consented Chinese classroom clips, each 120 seconds (16 minutes total), using an already installed MLX Whisper backend with quantized weights. A matched raw decoder and guarded workflow used the same first-pass settings; no detected gaps or retry-triggering anomalies occurred in these clips. This does **not** establish transcription correctness or guard effectiveness on difficult cases.
+- Human references are still pending. No CER/WER, summary-quality score, broad multilingual result or third-party usability success is claimed. Recordings, transcripts, model files and local paths are not distributed.
+
+The [evaluation protocol](EVALUATION.md) and offline scorer distinguish missing references from measured results. Independent installation reports use [TRY-IT.md](TRY-IT.md).
 
 ## Reproduce software checks
 
@@ -34,6 +43,6 @@ Integration tests require loopback listeners. Optional dependencies are not inst
 
 Hosted-runner checks do not establish clean end-user installation, OS security prompts, real speech quality or browser usability. Independent first-use trials are tracked separately using [TRY-IT.md](TRY-IT.md). POSIX file-mode checks apply only on POSIX; Windows file ACLs require separate validation.
 
-## Next quality-evaluation work
+## Remaining quality-evaluation work
 
-Build a small consented or synthetic evaluation set, with recording language, noise conditions, reference transcript and expected decisions/non-decisions. Measure terminology errors, omissions, attribution errors, invented decisions/actions and unrecognized gaps separately. Record model/version/settings, time and actual provider-reported usage. Keep failed examples and human review criteria. None of those results are claimed in this release.
+Complete human references for the private clips and add deliberately difficult samples, clearly separating ordinary samples from selected failure cases. For summaries, use expected decisions/non-decisions and measure terminology errors, omissions, attribution errors and invented decisions/actions separately. Record model/version/settings, time and actual provider-reported usage. Keep failed examples and human review criteria. None of those results are claimed in this release.

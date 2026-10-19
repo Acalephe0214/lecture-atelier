@@ -11,8 +11,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "cc65258850a45efe52daa31fd281f8af89ffa9abcfe2833d415e59f2b4ed690b",
-      "bytes": 870
+      "sha256": "267f4e2ccae009bae87f77b484732d97135a0fdd4b6c87b8a1a763128ca5912f",
+      "bytes": 987
     },
     {
       "path": "app.py",
@@ -396,18 +396,18 @@
     },
     {
       "path": "prepare_github.py",
-      "sha256": "e4c791683a200ce35231c84511fc1b45ad14e4f269cd2665c83b48ad9e2c976c",
-      "bytes": 5151
+      "sha256": "89bcb381b17be2fd4740befd5642c2654a163734fd5a248c31246dd548c02060",
+      "bytes": 5242
     },
     {
       "path": "README.md",
-      "sha256": "516386a1b2b899f93db4bdc2dc26e1dc5986d46321d2101d3f08cb32754b422a",
-      "bytes": 5099
+      "sha256": "9109a608f0aec093c522d748b044eeab574b8804055c098bddc61e6553e6ad25",
+      "bytes": 5249
     },
     {
       "path": "README.zh-CN.md",
-      "sha256": "7244ea8b027c324c77828d9505f726bbde3d72c66254a1b7d467711f2654dfdf",
-      "bytes": 3940
+      "sha256": "e7d925fbac983c9a5b47142db53aef5c3336765c0bfe47dd705c88c6a08b4b28",
+      "bytes": 4116
     },
     {
       "path": "PRIVACY.md",
@@ -436,8 +436,13 @@
     },
     {
       "path": "docs/VERIFICATION.md",
-      "sha256": "822c49f8fe583e490768afa32a8d669ec9e44b1ab412abcde4abc598f4a54879",
-      "bytes": 3074
+      "sha256": "ae0f2fcaa1471c34b37a4ea1d4f7daf0d45819abd74f6bca34c84046a5a36269",
+      "bytes": 4468
+    },
+    {
+      "path": "docs/EVALUATION.md",
+      "sha256": "bd4ac005ee4249cf0c099788d0370a645f2a1d70ce0c0acd7f844298520e6c4b",
+      "bytes": 3800
     },
     {
       "path": "docs/ROADMAP.md",
@@ -458,6 +463,11 @@
       "path": "docs/images/workspace.png",
       "sha256": "48c7323bc39fa701c64c3f61b32b0c7d0963181a99b7b2a2f3046c9d955de98d",
       "bytes": 206503
+    },
+    {
+      "path": "evaluate_transcripts.py",
+      "sha256": "9523e6d0b4dea868d755a0b73244dfbb57399d736e5db4bf0ed20b459ba7e5af",
+      "bytes": 5632
     },
     {
       "path": ".github/workflows/checks.yml",
@@ -633,6 +643,11 @@
       "path": "tests/test_bootstrap_profiles.py",
       "sha256": "7cb8657937c14577ff3ad54124bd2f8b915b2961e666b77b8d4d92b117a1ea3f",
       "bytes": 7938
+    },
+    {
+      "path": "tests/test_evaluate_transcripts.py",
+      "sha256": "0e4c16fc9e6a6a7807269c272884c2420cb1b4836e5307651330f4e4b3f9d831",
+      "bytes": 3760
     },
     {
       "path": "tests/test_i18n.cjs",

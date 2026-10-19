@@ -2,7 +2,7 @@
 
 A local-first workspace for **reviewable transcripts and source-linked notes**.
 
-[中文说明](README.zh-CN.md) · [Architecture](docs/ARCHITECTURE.md) · [Checks and limitations](docs/VERIFICATION.md) · [Roadmap](docs/ROADMAP.md)
+[中文说明](README.zh-CN.md) · [Downloads](https://github.com/Acalephe0214/lecture-atelier/releases) · [Architecture](docs/ARCHITECTURE.md) · [Checks and limitations](docs/VERIFICATION.md) · [Roadmap](docs/ROADMAP.md)
 
 ![Fictional transcript and meeting notes in Lecture Atelier](docs/images/workspace.png)
 
@@ -67,7 +67,7 @@ The Python server binds only to loopback. SQLite and private caches live in `.ru
 
 Transcripts and generated notes require human review. Text-only proofreading uses transcript context rather than audio, and source links do not guarantee semantic accuracy. Token and cost estimates are approximate.
 
-Software checks use synthetic fixtures and simulated model responses; there is no published transcription or summary-quality benchmark. Windows 10/11 x64 scripts are provided but have not been verified on Windows hardware; Windows ARM64 is unsupported. [Verification scope →](docs/VERIFICATION.md)
+Software checks use synthetic fixtures and simulated model responses; there is no published transcription or summary-quality benchmark. Hosted Linux, macOS and Windows checks pass, including basic setup with an existing Python; clean end-user Windows installation and speech setup remain unverified. Windows ARM64 is unsupported. [Verification scope →](docs/VERIFICATION.md)
 
 Supplementary slide and personal-note upload is planned. [Roadmap →](docs/ROADMAP.md)
 
