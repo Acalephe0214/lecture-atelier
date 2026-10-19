@@ -401,13 +401,13 @@
     },
     {
       "path": "README.md",
-      "sha256": "9109a608f0aec093c522d748b044eeab574b8804055c098bddc61e6553e6ad25",
-      "bytes": 5249
+      "sha256": "fb6eb0202e33f0852aff562b0dd104084e6a0af098a6378899a80d81b22104ed",
+      "bytes": 14070
     },
     {
       "path": "README.zh-CN.md",
-      "sha256": "e7d925fbac983c9a5b47142db53aef5c3336765c0bfe47dd705c88c6a08b4b28",
-      "bytes": 4116
+      "sha256": "eb81b9be88099993418e5ddccddf6e6f46acce2bbaff285285f9d701bdd6095d",
+      "bytes": 12510
     },
     {
       "path": "PRIVACY.md",
@@ -636,8 +636,8 @@
     },
     {
       "path": "tests/test_source_release.py",
-      "sha256": "0ed48de66d6fe32b7b20619297a574122182101aa4747b54aa4e638b2fa14ebe",
-      "bytes": 5265
+      "sha256": "f8f958106f1a51cff6c3bcdf85c9794eb6ff5595a43ea9399e73022e0abfc934",
+      "bytes": 6460
     },
     {
       "path": "tests/test_bootstrap_profiles.py",

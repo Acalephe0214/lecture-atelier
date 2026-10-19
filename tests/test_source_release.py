@@ -80,3 +80,22 @@ class SourceReleaseTests(unittest.TestCase):
         for value in (("/"+"Users/"+"example-author/private").encode(),b"sk-"+b"x"*32,b"-----BEGIN PRIVATE KEY-----\nnot-real"):
             with self.assertRaises(ValueError):check_public_content("synthetic.py",value)
         check_public_content("LICENSE",b"Copyright (c) 2026 Example")
+
+    def test_readmes_start_with_inputs_outputs_and_configuration_then_walkthrough(self):
+        required = {
+            "README.md": ("**Input:**", "**Output:**", "**What it does:**", "## What do I need to provide?"),
+            "README.zh-CN.md": ("**输入：**", "**输出：**", "**功能：**", "## 要填什么，才能使用？"),
+        }
+        for name, phrases in required.items():
+            text = (release.ROOT/name).read_text()
+            before_screenshot = text.split("![", 1)[0]
+            for phrase in phrases:
+                self.assertIn(phrase, before_screenshot, (name, phrase))
+            for value in ("API", "model" if name == "README.md" else "模型 ID", "Notion", "speech", "SRT", "TXT"):
+                self.assertIn(value, text, (name, value))
+            for anchor in re.findall(r"\]\(#([a-z-]+)\)", text):
+                self.assertIn('id="'+anchor+'"', text, (name, anchor))
+            self.assertIn("https://tingwu.aliyun.com/home", text)
+            self.assertIn("https://help.aliyun.com/zh/tingwu/product-introduction/", text)
+            for anchor in ("start", "workflow", "tingwu"):
+                self.assertIn('id="'+anchor+'"', text)
