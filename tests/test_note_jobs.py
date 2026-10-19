@@ -189,6 +189,31 @@ class NoteJobTests(unittest.TestCase):
         self.assertEqual(model.call_count, 1)
         self.assertEqual(self.store.get(self.item["id"])["notes"], self.notes)
 
+    def test_terminal_failure_waits_for_diagnostic_and_persisted_snapshot(self):
+        entered, release = threading.Event(), threading.Event()
+        save_diagnostic = self.jobs._save_diagnostic
+        def slow_diagnostic(*args):
+            entered.set()
+            release.wait(3)
+            save_diagnostic(*args)
+        with patch("core.chat_stream.chat", side_effect=pipeline.PipelineError("Synthetic failure")), \
+                patch.object(self.jobs, "_save_diagnostic", side_effect=slow_diagnostic):
+            self.jobs.start(self.item, self.settings)
+            try:
+                self.assertTrue(entered.wait(2))
+                self.assertEqual(self.jobs.get(self.item["id"])["status"], "running")
+                with self.assertRaises(pipeline.PipelineError):
+                    self.jobs.start(self.item, self.settings)
+            finally:
+                release.set()
+            job = self.wait()
+        self.assertEqual(job["status"], "failed")
+        self.assertTrue(job["diagnostics_available"])
+        persisted = self.store.get(self.item["id"])["generation_job"]
+        self.assertEqual(persisted["status"], "failed")
+        self.assertTrue(persisted["diagnostics_available"])
+        self.assertEqual(self.jobs.diagnostics(self.item["id"])["job_id"], job["id"])
+
     def test_concurrent_user_edit_is_not_overwritten(self):
         def edited(*args):
             response = self.fake_chat(*args)

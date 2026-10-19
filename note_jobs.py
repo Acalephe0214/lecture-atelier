@@ -132,6 +132,7 @@ class NoteJobs:
             job["usage"] = {key: sum(report[key] for report in reports if key in report) for key in USAGE_KEYS if any(key in report for report in reports)} if reports else None
 
     def _run(self, job, item, settings):
+        final_status = "failed"
         try:
             with self.lock:
                 job["status"] = "running"
@@ -161,23 +162,27 @@ class NoteJobs:
                 current["generation"]["requests_finished"] = job["requests_finished"]
             self.store.mutate(item["id"], save)
             with self.lock:
-                job.update(status="completed", phase="completed", completed_units=1, total_units=1,
+                job.update(phase="completed", completed_units=1, total_units=1,
                     message="总览已保存，原有详细笔记保持不变；内容仍需人工核查。" if job["scope"] == "overview" else "总览与详细笔记已保存，内容仍需人工核查。")
+                final_status = "completed"
         except Exception as exc:
             with self.lock:
-                job.update(status="failed", message=str(exc) if isinstance(exc, pipeline.PipelineError) else "AI 整理未完成；已有笔记保持不变，没有自动重试。")
+                job["message"] = str(exc) if isinstance(exc, pipeline.PipelineError) else "AI 整理未完成；已有笔记保持不变，没有自动重试。"
             self._save_diagnostic(job, exc, settings)
         finally:
+            # Publish a terminal state only after diagnostics exist and the job
+            # snapshot is persisted. Pollers may stop as soon as they see it.
             with self.lock:
+                job["status"] = final_status
                 job["elapsed_seconds"] = round(time.monotonic() - job["_started"], 1)
                 public = self.public(job)
-            try:
-                def persist(row):
-                    if row.get("generation_job", {}).get("id") == job["id"]:
-                        row["generation_job"] = public
-                self.store.mutate(item["id"], persist)
-            except Exception:
-                pass
+                try:
+                    def persist(row):
+                        if row.get("generation_job", {}).get("id") == job["id"]:
+                            row["generation_job"] = public
+                    self.store.mutate(item["id"], persist)
+                except Exception:
+                    pass
 
     def close(self):
         self.closed.set()

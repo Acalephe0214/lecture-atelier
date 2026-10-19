@@ -11,8 +11,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "267f4e2ccae009bae87f77b484732d97135a0fdd4b6c87b8a1a763128ca5912f",
-      "bytes": 987
+      "sha256": "c9155229a06eba4e1886771f43b076bb810b093c06813ddd2c0755e1668dc7f3",
+      "bytes": 1088
     },
     {
       "path": "app.py",
@@ -56,8 +56,8 @@
     },
     {
       "path": "note_jobs.py",
-      "sha256": "fa57da57ddba6e169ef41f49a3dbbc4ccee87739e092e19ee39acbae68cc0ed5",
-      "bytes": 11569
+      "sha256": "3cc672121690a8f6148dfff638bc5a44df3f2eaefcac5b88944855a656035fbf",
+      "bytes": 11835
     },
     {
       "path": "launch.command",
@@ -571,8 +571,8 @@
     },
     {
       "path": "tests/test_note_jobs.py",
-      "sha256": "58c9e813981d991737635fe45ea9d69ecc902e249cf40e71959afc8818011034",
-      "bytes": 15347
+      "sha256": "91d81cc2162eb768f014fd8cd3beb193cc7ce93fa4a39ca379c88a58fbb68344",
+      "bytes": 16654
     },
     {
       "path": "tests/test_output_language.py",
