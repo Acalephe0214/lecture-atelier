@@ -26,7 +26,7 @@ class ApplicationAcceptanceTests(unittest.TestCase):
         cls.base = f"http://127.0.0.1:{cls.port}"
         cls.log = open(Path(cls.tmp.name) / "server.log", "w+", encoding="utf-8")
         cls.process = subprocess.Popen(
-            [sys.executable, str(ROOT / "app.py"), "--port", str(cls.port),
+            [sys.executable, "-u", str(ROOT / "app.py"), "--port", str(cls.port),
              "--data-dir", str(Path(cls.tmp.name) / "data")],
             cwd=str(ROOT), stdout=cls.log, stderr=subprocess.STDOUT,
         )

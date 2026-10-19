@@ -99,7 +99,11 @@ class FriendPackageTests(unittest.TestCase):
                     client.close()
                 if process.poll() is not None: break
                 time.sleep(.05)
-            self.assertIsNotNone(payload,"Clean-copy server did not start")
+            if payload is None:
+                if process.poll() is None:
+                    process.terminate()
+                log, _ = process.communicate(timeout=5)
+                self.fail("Clean-copy server did not become ready: " + log)
             self.assertEqual(payload["lectures"],[])
             self.assertEqual([(row["id"], row["name"]) for row in payload["courses"]],[("course-sample","示例课程")])
             self.assertFalse(payload["settings"]["local_asr"]["configured"])

@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from socketserver import TCPServer
 from urllib.parse import parse_qs, unquote, urlsplit
 from uuid import uuid4
 
@@ -135,6 +136,12 @@ class LocalServer(ThreadingHTTPServer):
         self.note_jobs = NoteJobs(store)
         self.correction_jobs = CorrectionJobs(store)
         super().__init__(address, Handler)
+
+    def server_bind(self):
+        # Loopback needs no reverse-DNS lookup; resolver stalls must not delay startup.
+        TCPServer.server_bind(self)
+        self.server_name = "localhost"
+        self.server_port = self.server_address[1]
 
     def server_close(self):
         self.jobs.close()
@@ -912,10 +919,10 @@ def main():
     except OSError:
         parser.exit(1, "无法启动：端口可能被占用，或数据目录不可写。可尝试 --port 8768。\n")
     url = "http://127.0.0.1:" + str(server.server_port)
-    print("听课之间已启动：" + url)
-    print("Lecture Atelier is running at: " + url + "/?ui=en")
+    print("听课之间已启动：" + url, flush=True)
+    print("Lecture Atelier " + APP_VERSION + " is running at: " + url + "/?ui=en", flush=True)
     print("录音和笔记保存在本地。按 Ctrl+C 停止。")
-    print("Keep this Terminal running. Stop with Control+C, not Command+C (copy).")
+    print("Stop with Control+C in this terminal.", flush=True)
     if args.open:
         import webbrowser
         threading.Timer(0.3, lambda: webbrowser.open(url)).start()

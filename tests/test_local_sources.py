@@ -4,9 +4,11 @@ import json
 import os
 from pathlib import Path
 import struct
+import sqlite3
 import tempfile
 import unittest
 import wave
+from unittest.mock import patch
 
 from core import pipeline
 from index_local_course import prepare_manifest, register
@@ -53,6 +55,25 @@ class LocalIndexTests(unittest.TestCase):
         self.assertIn("未人工听核", parsed["preamble"])
         with self.assertRaises(pipeline.PipelineError):
             pipeline.export_srt(parsed["segments"])
+
+    def test_registration_closes_every_sqlite_handle_including_backup(self):
+        connections = []
+        connect = sqlite3.connect
+        def tracked(*args, **kwargs):
+            connection = connect(*args, **kwargs)
+            connections.append(connection)
+            return connection
+        with patch("index_local_course.sqlite3.connect", side_effect=tracked):
+            _, report = self.import_one()
+        self.assertGreaterEqual(len(connections), 2)
+        for connection in connections:
+            with self.assertRaises(sqlite3.ProgrammingError):
+                connection.execute("SELECT 1")
+        # Moving an unused backup is legal on Windows only after its handle closes.
+        backup = Path(report["backup"])
+        moved = backup.with_suffix(".closed-check")
+        backup.rename(moved)
+        moved.rename(backup)
 
     def test_fifth_lecture_summaries_and_appendix_are_not_speech(self):
         text = "# 第五讲\n\n## 内容导航\n\n**00:00—00:15　导读**\n\n整理提要。\n\n## 录音转写\n\n**00:00:00**\n\n录音正文。\n\n**00:01:00**\n\n第二段。\n\n## 重点复听\n\n不确定词。\n\n## 术语对照\n\n非逐字原话。"

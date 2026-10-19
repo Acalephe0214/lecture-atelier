@@ -1,5 +1,6 @@
 """Scene, provenance and correction checks; synthetic text and mocked providers."""
 import json
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
@@ -92,12 +93,13 @@ class WorkflowServerTests(unittest.TestCase):
         self.assertEqual(self.call("POST", base + "/external-transcription/prepare", {})[0], 400)
         status, result, _ = self.call("POST", base + "/external-transcription/prepare", {"acknowledge_privacy": True})
         self.assertEqual(status, 200, result)
-        self.assertIn(str(audio), result["prompt"])
+        material, _ = json.JSONDecoder().raw_decode(result["prompt"][result["prompt"].index("{"):])
+        self.assertEqual(Path(material["audio_path"]).resolve(), audio.resolve())
         self.assertIn("准备此任务包不等于上传授权", result["prompt"])
         self.assertEqual(result["lecture"]["external_transcription"]["status"], "prepared")
         self.assertNotIn("external_transcription_private", result["lecture"])
         export = self.call("GET", base + "/export?format=json")[1]
-        self.assertNotIn(str(audio), json.dumps(export))
+        self.assertNotIn(json.dumps(str(audio.resolve()))[1:-1], json.dumps(export))
         status, detail, _ = self.call("POST", base + "/transcript", {"text": "导回的完整稿", "source": "tingwu", "replace": True})
         self.assertEqual(status, 200, detail)
         self.assertEqual(detail["external_transcription"]["status"], "imported")

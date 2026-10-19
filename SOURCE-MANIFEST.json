@@ -11,13 +11,13 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "12eb0b26493efcb1d7c1ebfc1dd50ab1f80721ce664658fd2bd10bd393a90de5",
-      "bytes": 774
+      "sha256": "cc65258850a45efe52daa31fd281f8af89ffa9abcfe2833d415e59f2b4ed690b",
+      "bytes": 870
     },
     {
       "path": "app.py",
-      "sha256": "e5ca12f499b140fad002f3ec4406d68c6e8a2129bcc844da4bb4e1394cf06679",
-      "bytes": 53366
+      "sha256": "3232bd469d86fa57972db4db0e3ef54cd111542b8cc68bdede7b12a3f9b7999b",
+      "bytes": 53665
     },
     {
       "path": "store.py",
@@ -31,8 +31,8 @@
     },
     {
       "path": "index_local_course.py",
-      "sha256": "d3206063b201249ac01a4a7ff8bf4896f5bc3ad3a65229299dff0922b7e6c125",
-      "bytes": 5411
+      "sha256": "941eb190882501beb712425d3ecee0d5ace3d20768314b45ee2056c857aff56e",
+      "bytes": 5539
     },
     {
       "path": "local_transcription.py",
@@ -496,8 +496,8 @@
     },
     {
       "path": "tests/test_acceptance.py",
-      "sha256": "d5fcd08e47bbfe5177339354f5b177e8985bc7292f7c332b5692406727736d8f",
-      "bytes": 10588
+      "sha256": "2ad1c033dd19120c291db2eb7a91d60e675c2c1b81f4e4ba045d7729306ac80e",
+      "bytes": 10594
     },
     {
       "path": "tests/test_asr_guard.py",
@@ -546,8 +546,8 @@
     },
     {
       "path": "tests/test_local_sources.py",
-      "sha256": "ed066d01de358aa890cdc6aa23c3388202caa456b2b68a3c5451f4bf4f4cae29",
-      "bytes": 10119
+      "sha256": "28351b03400085c5368aa393d795e4e1e4cfdc8f7ffc66c0491187438dc723c7",
+      "bytes": 11020
     },
     {
       "path": "tests/test_local_transcription.py",
@@ -576,8 +576,8 @@
     },
     {
       "path": "tests/test_packaging.py",
-      "sha256": "143501228574be92cdc39c2007efd773b4a514548f9f5f1f9045b86e1eea5d57",
-      "bytes": 6372
+      "sha256": "4ee6f4d893c8ba6f96b593bbdd482ca7ad88ee5fc3e551993317085f08760fce",
+      "bytes": 6543
     },
     {
       "path": "tests/test_pipeline.py",
@@ -601,8 +601,8 @@
     },
     {
       "path": "tests/test_server.py",
-      "sha256": "ad9b7b5bc7420286a72f64793b492be018943d64e01fc1e8e35807b51939a120",
-      "bytes": 19280
+      "sha256": "9af3442e435bbb80ba4236e5945bd58cc9f1065775c378d00d573ec0c7bff348",
+      "bytes": 19861
     },
     {
       "path": "tests/test_setup_check.py",
@@ -616,8 +616,8 @@
     },
     {
       "path": "tests/test_workflow.py",
-      "sha256": "5256b05944ee96502f3b84b0628d432cd16d824833e08e551819701243f5f004",
-      "bytes": 13335
+      "sha256": "d9fc2e37c7a7815ca30a4aae005fd2282ac69fb758c1ce1d9efa83ce3979c859",
+      "bytes": 13518
     },
     {
       "path": "tests/test_workflow_audit.py",

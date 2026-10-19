@@ -8,6 +8,7 @@ never silently overwritten. Uses the app's ordinary SQLite file.
 from __future__ import annotations
 
 import argparse
+from contextlib import closing
 from datetime import datetime
 import json
 import os
@@ -49,7 +50,8 @@ def register(manifest, prepared, data_dir):
     backup_dir = store.root / "backups"
     backup_dir.mkdir(exist_ok=True, mode=0o700)
     backup = backup_dir / ("before-local-index-" + datetime.now().strftime("%Y%m%d-%H%M%S-") + uuid4().hex[:8] + ".sqlite3")
-    with sqlite3.connect(store.database) as source, sqlite3.connect(backup) as destination:
+    # SQLite's connection context manager commits, but does not close handles.
+    with closing(sqlite3.connect(store.database)) as source, closing(sqlite3.connect(backup)) as destination:
         source.backup(destination)
     backup.chmod(0o600)
     output = []

@@ -21,6 +21,19 @@ from local_sources import prepare
 from audio_processing import fingerprint
 
 
+class LoopbackBindingTests(unittest.TestCase):
+    def test_startup_does_not_resolve_a_hostname(self):
+        with tempfile.TemporaryDirectory() as directory:
+            with patch("socket.getfqdn", side_effect=AssertionError("Unexpected reverse DNS")):
+                server = make_server(0, directory)
+            try:
+                self.assertEqual(server.server_name, "localhost")
+                self.assertGreater(server.server_port, 0)
+                self.assertEqual(server.server_address[0], "127.0.0.1")
+            finally:
+                server.server_close()
+
+
 class ServerTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix="lecture-server-test-")
