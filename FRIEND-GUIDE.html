@@ -4,7 +4,7 @@
 <style>
 :root{color-scheme:light;--ink:#243e33;--muted:#667268;--line:#d6ded1}*{box-sizing:border-box}body{margin:0;background:#eeefe8;color:var(--ink);font:16px/1.95 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif}main{max-width:960px;margin:40px auto;padding:44px 56px;background:#fffef9;border:1px solid var(--line);border-radius:18px}header{border-bottom:1px solid var(--line);padding-bottom:26px}small,.hint{color:var(--muted)}h1{font:500 38px/1.4 "Songti SC",Georgia,serif;margin:16px 0}h2{font-size:23px;margin:42px 0 14px}h3{font-size:18px;margin-top:25px}a{color:#426b49;text-underline-offset:4px;overflow-wrap:anywhere}nav{display:grid;grid-template-columns:1fr 1fr;gap:9px 22px;padding:22px;background:#f0f3e9;border-radius:10px;margin:25px 0}nav a{font-size:14px}.callout{padding:18px 22px;border:1px solid #ccdac5;border-radius:10px;background:#edf3e7;margin:20px 0}.warning{background:#faf3e5;border-color:#dfcda8}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:13px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}th:first-child{width:27%}pre{padding:18px;background:#203e35;color:#f1f3df;border-radius:9px;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.85 Menlo,Consolas,monospace}code,kbd{font-family:Menlo,Consolas,monospace;font-size:.9em;overflow-wrap:anywhere}kbd{border:1px solid #ccd5c7;border-radius:4px;padding:2px 6px;background:#f4f6ef}li{margin:10px 0}details{border-top:1px solid var(--line);padding:16px 0}summary{cursor:pointer;font-weight:600}section{scroll-margin-top:20px}:focus-visible{outline:3px solid #718b65;outline-offset:4px}footer{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}@media(max-width:680px){main{margin:10px;padding:26px 22px}h1{font-size:29px}nav{grid-template-columns:1fr;padding:18px}table{font-size:13px}td,th{padding:10px 6px}ol,ul{padding-left:23px}}@media print{body{background:white}main{border:0;margin:0;padding:15px}nav{display:none}pre{background:#eee;color:#111}h2{break-after:avoid}}
 </style></head><body><main>
-<header><small>LECTURE ATELIER / 完整使用手册 · 2026-10-18</small><h1>装好一次，<br>从第一段录音开始。</h1><p>写给第一次使用本地应用的朋友。按顺序完成前四节就能开始；AI、Notion 都是后续可选功能。</p><p><a href="START-HERE.html">← 快速开始与 Codex 指令</a> · <a href="FRIEND-GUIDE-EN.html">Complete English instructions</a></p></header>
+<header><small>LECTURE ATELIER / 完整使用手册 · 2026-10-18</small><h1>装好一次，<br>从第一段录音开始。</h1><p>本地安装与使用的分步指南。按顺序完成前四节就能开始；AI、Notion 都是后续可选功能。</p><p><a href="START-HERE.html">← 快速开始与 Codex 指令</a> · <a href="FRIEND-GUIDE-EN.html">Complete English instructions</a></p></header>
 <div class="callout"><strong>先分清三件事：</strong>这个 ZIP 是程序和安装说明，不是已装好模型的离线 App；终端运行本地服务，浏览器是操作界面；不用 API 也能做本地转写，只有 AI 校对、总结和 Notion 导出需要各自的云端配置。</div>
 <nav aria-label="说明目录"><a href="#prepare">01　收到 ZIP 后</a><a href="#install">02　首次安装：Mac / Windows</a><a href="#daily">03　每天启动与停止</a><a href="#first">04　第一节课：两种路线</a><a href="#review">05　回听、缺口与降噪</a><a href="#api">06　API 三个字段怎么填</a><a href="#ai">07　AI 校对与结构化总结</a><a href="#export">08　导出与 Notion</a><a href="#data">09　数据、备份、升级与分享</a><a href="#trouble">10　故障排查</a><a href="#codex">11　让 Codex 帮你安装</a><a href="#checklist">12　第一次使用检查清单</a></nav>
 
@@ -12,7 +12,7 @@
 <li><strong>完整解压。</strong>Mac 在 Finder 双击 ZIP；Windows 对 ZIP 使用“全部解压”。进入解压后的 <code>LectureAtelier</code>，应看到 <code>app.py</code>、<code>static</code>、<code>START-HERE.html</code> 和安装脚本。</li>
 <li><strong>放到固定、自己有写入权限的位置。</strong>例如“文稿 / Documents”。不要在 ZIP 预览中启动，不要只拖出一个 .app，不覆盖已有使用目录。</li>
 <li><strong>准备网络和空间。</strong>首次约下载 0.5–1.5 GB，建议留 2–4 GB 磁盘；需能连接 GitHub、PyPI、Hugging Face。大小、速度依平台与缓存而变，不保证几分钟装完。</li>
-<li><strong>不需要作者账号。</strong>基础使用不需 Codex、API key 或管理员权限；后续选择 AI 功能才需自己的模型服务账号。</li></ol>
+<li><strong>基础功能无需账号。</strong>本地处理不需 API key 或管理员权限；云端 AI 功能需配置相应服务。</li></ol>
 <p>默认安装多语言 CPU <code>faster-whisper small</code>，面向 Mac（M 系列或 Intel）和 Windows 10/11 x64；Windows ARM64 不在范围。Windows 脚本尚未真机验收，不能把提供脚本当成所有电脑都已验证。已有 M 系列 Mac 的 MLX 配置会保留。</p></section>
 
 <section id="install"><h2>02 / 首次安装：只做一次</h2><h3>Mac：在 Finder 里操作</h3><ol>
@@ -25,7 +25,7 @@
 <li>双击 <code>setup-windows.bat</code>；若看不到扩展名，先在资源管理器开启“文件扩展名”，避免点错。</li>
 <li>出现下载确认时输入 <code>y</code> 并回车。等项目内 Python、依赖与 Whisper 模型安装，不要中途关命令窗口。</li>
 <li>成功后自动启动。没有自动开浏览器时访问 <code>http://127.0.0.1:8767/</code>，并保留命令窗口。</li></ol>
-<div class="callout warning"><strong>系统拦截不是让你关闭安全功能。</strong>Mac .app 只是未签名启动器，不是已公证、完全自包含的桌面软件。若 Gatekeeper、SmartScreen、杀毒软件或 PowerShell 策略拦截，先核实来源并保留准确提示；不要关闭防护、移除隔离标记、运行管理员命令或绕过执行策略。把错误交给发送者 / Codex 判断。</div>
+<div class="callout warning"><strong>系统拦截不是让你关闭安全功能。</strong>Mac .app 只是未签名启动器，不是已公证、完全自包含的桌面软件。若 Gatekeeper、SmartScreen、杀毒软件或 PowerShell 策略拦截，先核实来源并保留准确提示；不要关闭防护、移除隔离标记、运行管理员命令或绕过执行策略。排查时保留完整错误信息。</div>
 <h3>装到一半失败了怎么办？</h3><p>看终端最后几行，不要不断点安装。网络恢复后可重新运行同一 setup，已有依赖标记和缓存可复用，但不保证所有断网都原位续传。若只是模型下载失败，Python 与 PDF 依赖可能已就绪：可尝试 launch 启动阅读、导入和编辑；语音转写要等模型完整。PDF 只有相关依赖装好后才可用。不要删除 <code>.runtime</code> 来“重新安装”。</p>
 <p class="hint">只试基础功能、有现成 Python 3.10+ 时，可直接 launch，不必先装语音模型。完整安装支持 Python 3.10–3.13，主要测试基线是 3.12。安装完成不代表语音推理已实测。</p></section>
 
@@ -33,19 +33,19 @@
 <tr><td>首次安装已完成</td><td>Mac 双击 <code>launch.command</code>；Windows 双击 <code>launch-windows.bat</code>。不必再次 setup。</td></tr>
 <tr><td>只关了浏览器，服务终端还在</td><td>重新打开本地地址或书签，不要重复启动副本。</td></tr>
 <tr><td>电脑重启 / 服务停止</td><td>再运行 launch；已保存的资料不会因此删除。</td></tr>
-<tr><td>想停止程序</td><td>点击运行服务的终端 / 命令窗口，按 <kbd>Control</kbd> + <kbd>C</kbd>，等服务退出。Mac 的 <kbd>Command</kbd> + <kbd>C</kbd> 是复制。</td></tr>
+<tr><td>想停止程序</td><td>点击运行服务的终端 / 命令窗口，按 <kbd>Control</kbd> + <kbd>C</kbd>，等服务退出。</td></tr>
 <tr><td>更新了后端程序</td><td>等任务结束，停止旧服务，再启动新版；仅刷新浏览器不加载新 Python 后端。</td></tr></tbody></table>
 <p>关闭浏览器不会停止服务。安装、转写时让电脑保持运行，睡眠可能暂停处理；不要把强行关机当作正常停止。AI 请求已到供应商时，关本地服务也可能计费；目前 AI 总结没有取消按钮。</p>
 <p>顶部可选 <strong>English / 中文</strong>，只改界面，不翻译课程、笔记和提示词；录音语言另选。转写失败、缺口原因、低置信、重试及校对/降噪状态也跟随界面语言；系统缺口说明仅在显示时翻译，真实原文不动。未收录的诊断先显示英文提示，可点 Show original diagnostic 展开原始信息。桌面可拖三栏细竖柄，正文右边界向右拖可加宽；双击分隔线或点三栏图标恢复。手机宽度用课程 / 原文 / 笔记标签切换。</p></section>
 
 <section id="first"><h2>04 / 第一节课：有稿与无稿，两条路线</h2><p><strong>先验证：</strong>打开“探索虚构示例”，确认能读、能编辑；随后用一段 30–60 秒、你有权使用的录音测试，不要第一步就处理两小时课程。</p><ol>
-<li>左侧选择课程，点“新建课次”，填标题与日期。首次只有一个通用“示例课程”分类，没有作者课程目录，也没有真实课次；可点“新增课程”创建自己的分类。演示按钮最多创建一个虚构例子，中英文共用同一份，切换界面不改写已保存内容。</li>
+<li>左侧选择课程，点“新建课次”，填标题与日期。新环境提供一个通用“示例课程”分类；可点“新增课程”创建自己的分类。演示按钮最多创建一个虚构例子，中英文共用同一份，切换界面不改写已保存内容。</li>
 <li>中间点“添加录音”，选择本机文件。这是在本地 App 导入，不是上传到模型平台。普通上传保存本地副本；外部索引仍依赖原路径。</li>
 <li>选“录音语言”：单语可选中文、英语、越南语、法语、德语、日语等；双语可直接选“法语＋越南语”，也可选“多语言课程”勾选 2—6 种实际使用的语言。其他支持语言在弹窗输入代码，例如 es。设置仅作用于这份录音，不改笔记输出语言。</li></ol>
 <div class="callout"><strong>多语言课程：</strong>以 12 秒短窗判断候选语言，带 1 秒上下文，并用实际词时间戳裁剪接缝。原语言保留、不翻译；已有中英混合也使用这条路径。会增加本地计算；语言分数只是启发式依据，不保证同一句快速混说准确。判断不足标记回听，不强行补出文字、不转云端。某段仍有问题，可先把这份录音临时改为该段单语，再局部补转；补完改回组合。不必重新全文识别。法越组合目前只做模拟调度与界面验证，实际效果请用有权使用的短录音测试。</div>
 <div class="callout"><strong>MP4 / MOV / WEBM 本地转写：</strong>先提取第一条音轨，缓存为 16 kHz 单声道 WAV，再启动 Whisper；进度区会先显示“提取视频音轨”。不先转有损 MP3，不覆盖原视频，也不去掉开头静音。后续全文重试与局部补转可复用有效缓存，原文件变化后缓存失效。缓存约每小时 110 MiB，需额外磁盘空间；无音轨、缺 FFmpeg、空间不足时先报错，不继续识别。提取可能减少重复解码开销，但不保证整段转写加速多少。外部云端转写不自动走这个本地步骤。</div>
 <h3>A. 我已经有文字稿</h3><ol><li>点“导入转写稿”，选 TXT、SRT、VTT 或符合格式的 JSON，确认导入；其他工具导出的稿也先检查格式。</li><li>无时间码 TXT 可以阅读、手改和整理，但不能保证逐句定位音频，也不能凭空生成真实字幕时间码；最好保留原始 SRT / 带时间戳 JSON。</li><li>直接核对现有稿，不默认全文重识别。当前<strong>没有</strong>自动抽样对比外部稿与本地识别、再择优融合的完整功能。</li></ol>
-<h3>B. 我只有录音，没有稿</h3><ol><li>确认首次模型安装完成，在“设置与术语表”检查本地环境。安装器通常自动填好路径，不要填作者目录。</li><li>选择本地 Whisper 转写并确认本地处理。程序启用词级对齐、静音幻觉抑制，检查重复与成片塌缩的词时间码；这会增加计算，不保证实时。</li><li>检查正文和缺口报告。段尾假句不再连带丢弃可独立校验的正常前缀；仍拿不准的范围保持缺口，不代表无声。已处理块数与无异常块数分开显示。中断且有已保存块时，可用页面的断点继续 / 复用正常段入口，不要立刻整节重算。补转最多选 64 段、累计 30 分钟，顺序尝试且可停止；候选仍需回听后采用，不自动覆盖。</li></ol>
+<h3>B. 我只有录音，没有稿</h3><ol><li>确认首次模型安装完成，在“设置与术语表”检查本地环境。安装器通常自动配置路径；可在设置中检查。</li><li>选择本地 Whisper 转写并确认本地处理。程序启用词级对齐、静音幻觉抑制，检查重复与成片塌缩的词时间码；这会增加计算，不保证实时。</li><li>检查正文和缺口报告。通过校验的片段会保留，不确定的范围标为转写缺口。已处理块数与无异常块数分开显示。中断且有已保存块时，可用页面的断点继续 / 复用正常段入口，不要立刻整节重算。补转最多选 64 段、累计 30 分钟，顺序尝试且可停止；候选仍需回听后采用，不自动覆盖。</li></ol>
 <p class="hint">可添加 M4A、MP3、WAV 和可解码 QuickTime 音频。.qta / .qat 是否可读取决于真实内容，不能只改扩展名。浏览器可播放与模型可解码是两件事；iPhone 特殊格式失败时，从语音备忘录重导普通 M4A，保留原件。</p></section>
 
 <section id="review"><h2>05 / 回听、缺口、降噪：先保证文字可信</h2><ol>
@@ -67,9 +67,9 @@ API key：你自己创建的密钥
 <p>右侧“费率与 Notion”可填<strong>每百万 token</strong>输入 / 输出单价。未知模型不乱猜价格；固定费率上下界填相同值。token / 价格区间是字符法预估，不是预算上限；复杂度只调预估，不修改提示词。实际费用看供应商账单；实际 token 只显示接口已报告部分。</p></section>
 
 <section id="ai"><h2>07 / AI 两个按钮，不是同一件事</h2><h3>AI 校对稿：改转写的疑似错误</h3><ol><li>中间点“AI 校对稿”，填话题与术语，如“项目评审；用户体验；性能测试；改进计划”。这是背景，不是要求把原话改成这些词。</li><li>确认发送文字后，删除线表示原词，新增文字用另一颜色，不确定项标为待核对。</li><li>逐处接受 / 拒绝，也可批量处理。先核对数字、否定、专名与决定；别无条件“一键接受”。少量词内重复可能自动清理，可撤销。</li><li>听不清时回听或局部 Whisper 补转，不用文字模型凭逻辑填造缺口。改原文后，相关已核查笔记可能变待复核。</li></ol>
-<h3>先选笔记输出语言</h3><p>右侧“笔记输出语言”可选中文、English、Français、Deutsch、Tiếng Việt、日本語或跟随原文，默认中文以兼容旧方案。它与界面语言、录音语言独立，每节材料分别保存。点“语言设置”可看输出规则与对应语言的默认场景提示词；切语言不会自动改写已保存文字或调用模型。自定义提示词保留原文，需自行编辑；输出语言规则仍对下次生成生效。标题、正文、总览和待办用所选语言，原文证据引句与 JSON 字段/编号不翻译；AI 校对仍只校原稿，不做翻译。仅补总览不会把旧详细笔记一起翻译。语言效果取决于所选模型，应人工检查；固定界面/导出模板栏目仍与界面或导出语言有关。</p>
-<h3>AI 总览与详细笔记：从文字生成阅读材料</h3><ol><li>右侧“整理用途”选课堂、讲座、课堂讨论、会议纪要或自定义；在“提示词”检查 / 修改要求。会议重最终决策与待办，课堂重概念论证。</li><li>点“AI 总览与详细笔记”，看外发与用量确认。先逐批生成详细笔记，再全篇综合；进度显示阶段、用时、请求数、输出字符与已报告 token。</li><li>读“总结总览”和“详细笔记”。总览列重点、最终决策、行动、未决问题及来源；可追溯不等于语义已核实。</li><li><strong>已有详细笔记，只缺总览：</strong>用“仅补生成总览 / 保留现有笔记，仅补生成总览”。它会生成总览，不是“不生成”；不重做或删除详细笔记。</li></ol>
-<h3>生成失败时</h3><p>旧笔记与旧总览保留，不自动重试付费请求。区分输出截断、无正文、JSON 或来源错误；新失败可下载本机诊断，可能含返回正文，请勿公开。再次点击会产生新请求、可能再收费；旧版本丢弃的响应不能恢复。别不停重跑整节材料来试按钮。</p>
+<h3>先选笔记输出语言</h3><p>右侧“笔记输出语言”可选中文、English、Français、Deutsch、Tiếng Việt、日本語或跟随原文，默认中文。它与界面语言、录音语言独立，每节材料分别保存。点“语言设置”可看输出规则与对应语言的默认场景提示词；切语言不会自动改写已保存文字或调用模型。自定义提示词保留原文，需自行编辑；输出语言规则仍对下次生成生效。标题、正文、总览和待办用所选语言，原文证据引句与 JSON 字段/编号不翻译；AI 校对仍只校原稿，不做翻译。仅补总览不会把旧详细笔记一起翻译。语言效果取决于所选模型，应人工检查；固定界面/导出模板栏目仍与界面或导出语言有关。</p>
+<h3>AI 总览与详细笔记：从文字生成阅读材料</h3><ol><li>右侧“整理用途”选课堂、讲座、课堂讨论、会议纪要或自定义；在“提示词”检查 / 修改要求。会议重最终决策与待办，课堂重概念论证。</li><li>点“AI 总览与详细笔记”，看外发与用量确认。先逐批生成详细笔记，再全篇综合；进度显示阶段、用时、请求数、输出字符与已报告 token。</li><li>读“总结总览”和“详细笔记”。总览列重点、最终决策、行动、未决问题及来源；可追溯不等于语义已核实。</li><li><strong>已有详细笔记，只缺总览：</strong>用“仅补生成总览 / 保留现有笔记，仅补生成总览”。此操作只生成总览，保留已有详细笔记。</li></ol>
+<h3>生成失败时</h3><p>旧笔记与旧总览保留，不自动重试付费请求。区分输出截断、无正文、JSON 或来源错误；新失败可下载本机诊断，可能含返回正文，请勿公开。再次生成会发起新的 API 请求，可能产生额外费用。</p>
 <h3>如何理解两种任务的预估</h3><p>预估分别列“详细笔记阶段”和“总览综合阶段”。“仅总览”不会重写详细笔记；未经人工编辑且仍待核查的原句复制卡片会在本次请求中改成原文索引，完整原文仍提交，但不再重复发送复制正文。人工或已核查笔记保持原样；没有被笔记引用的原文也会进入总览。首轮分组使用实际执行计划，已知会超限或来源无效时在调用前拒绝。“总览＋详细笔记”会重新生成详细笔记，其新长度尚不可知，所以总览阶段仅以当前笔记或原文分组作参考，后续综合次数、推理用量和费用仍可能超出区间。预估不是预算上限，也不承诺总览永远比全流程便宜。</p>
 <p>“其他工具 · 原句复制卡片”只是原句卡片，不是 AI 校对、总结或原稿备份。只要转写稿就导出 TXT / SRT，不必先生成卡片。</p></section>
 
@@ -85,7 +85,7 @@ API key：你自己创建的密钥
 <details><summary>网页连接被拒绝 / 打不开</summary><p>看服务终端还在不在；已停就 launch。安装失败先看最后一条错误。不需公网域名，也不要把监听改成 0.0.0.0。</p></details>
 <details><summary>端口占用 / 反复弹窗口</summary><p>先试已有地址、找原终端。不要反复开副本或批量 kill Python；不明进程占用交给协助者选另一个端口，别让两个服务同时改同一库。</p></details>
 <details><summary>下载卡住 / Hugging Face 或 PyPI 连接失败</summary><p>保留准确报错，检查官方源可达性；恢复后重跑 setup。别找陌生脚本改系统代理、跳过证书或换不明镜像。区分 Python / 依赖失败与模型失败；模型未完整不能称转写就绪。</p></details>
-<details><summary>模型目录错误 / 检查通过但仍不能识别</summary><p>确认安装完成、从 launch 启动，核对 backend、Python、模型真实路径；别抄作者路径。检查通过不能证明内存够、音频可解码或推理成功。先用短音频看错误。</p></details>
+<details><summary>模型目录错误 / 检查通过但仍不能识别</summary><p>确认安装完成、从 launch 启动，核对 backend、Python 和模型的本机路径。检查通过不能证明内存够、音频可解码或推理成功。先用短音频看错误。</p></details>
 <details><summary>iPhone QTA / QAT 导入、播放失败</summary><p>留原件，重新导普通 M4A，不只改后缀；容器与编码决定能否读。多音轨处理用第一条音轨，不保证空间效果与额外音层。</p></details>
 <details><summary>AI 401 / 403、429、400、JSON 错误</summary><p>401 / 403 检查 key、模型权限；429 看额度 / 频率；400 核对根地址、模型 ID 与流式 Chat Completions JSON 兼容性。JSON / 截断先看诊断和用量，不无限重试。保存设置不等于认证成功，失败不保证免费。</p></details>
 <details><summary>Notion 导出失败</summary><p>检查 token、父页面共享与写权限；结果未知先查 Notion 是否已建页。LLM key 不能代替 Notion token。</p></details>

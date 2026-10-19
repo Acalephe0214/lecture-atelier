@@ -1,6 +1,6 @@
-# Verification scope — not an accuracy benchmark
+# Verification
 
-The repository contains engineering regression checks. It does **not** yet contain a curated, representative speech corpus, a human-rated summary dataset, or a published accuracy/performance benchmark. Do not turn passing tests into a recognition-accuracy claim.
+The repository contains engineering regression checks. Transcription accuracy and summary quality have not yet been benchmarked against a representative evaluation dataset.
 
 ## Available checks
 
@@ -30,7 +30,7 @@ node tests/test_playback.cjs
 node tests/test_panels.cjs
 ```
 
-Some environments restrict loopback listeners and need local-server permission. Read the actual test output, including skips. Optional dependencies are not installed by the tests. The CI configuration describes intended checks; a workflow file alone is not proof that GitHub Actions has run.
+Integration tests require loopback listeners. Optional dependencies are not installed by the tests; unavailable components are reported as skips. [GitHub Actions](https://github.com/Acalephe0214/lecture-atelier/actions/workflows/checks.yml) runs the software checks on Linux with Python 3.12 and Node.js 22.
 
 ## Next quality-evaluation work
 

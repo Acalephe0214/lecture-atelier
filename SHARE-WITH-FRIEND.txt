@@ -1,6 +1,6 @@
-可以直接转发给朋友：
+Lecture Atelier（听课之间）· 快速开始
 
-这是我做的 Lecture Atelier（听课之间），本地录音转写和笔记工具。
+本地录音转写、校对和笔记工具。
 1. 完整解压 ZIP，先打开 START-HERE.html，再按“完整中文手册”或
    “Complete English manual”阅读。前四节是解压、安装、启动和第一段录音。
 2. Mac 双击 setup-mac.command；Windows 10/11 x64 双击 setup-windows.bat。
@@ -8,7 +8,7 @@
    依赖，再下载多语言模型。约 0.5–1.5 GB，留 2–4 GB 空间，需要能连接
    GitHub / PyPI / Hugging Face。不上传录音，不需要管理员权限或 API key。
 4. 以后 Mac 双击 launch.command，Windows 双击 launch-windows.bat。
-   保留终端窗口；关闭程序按 Control+C，不是 Command+C。
+   在运行服务的终端按 Control+C 停止程序。
 5. 转写是本地的；AI 校对/总结需要你自己的模型 API，Notion 也需你自己的
    connection。每次发送文字前会单独确认。页面可切换 English / 中文。
 6. 安装不成功先看手册“故障排查”，不要删除 .runtime、关闭系统防护或

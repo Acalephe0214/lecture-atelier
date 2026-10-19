@@ -58,11 +58,23 @@ class SourceReleaseTests(unittest.TestCase):
         self.assertTrue(set(LICENSE_FILES).issubset(names))
         self.assertIn("Copyright (c) 2022 OpenAI",(release.ROOT/"licenses/openai-whisper-LICENSE").read_text())
         self.assertIn("Copyright (c) 2026 Yanbo Qiao",(release.ROOT/"LICENSE").read_text())
-        for name in ("README.md","README.zh-CN.md","docs/ARCHITECTURE.md","docs/ROADMAP.md","docs/PUBLISHING.md","licenses/README.md"):
+        for name in ("README.md","README.zh-CN.md","PRIVACY.md","SECURITY.md","docs/ARCHITECTURE.md","docs/VERIFICATION.md","docs/ROADMAP.md","docs/PUBLISHING.md","licenses/README.md"):
             for link in re.findall(r"\]\(([^)]+)\)",(release.ROOT/name).read_text()):
                 if "://" in link or link.startswith("#"):continue
-                resolved=(Path(name).parent/link.split("#")[0]).as_posix()
+                resolved=(release.ROOT/Path(name).parent/link.split("#")[0]).resolve().relative_to(release.ROOT.resolve()).as_posix()
                 self.assertIn(resolved,names,(name,link))
+
+    def test_readmes_use_project_documentation_not_personal_handoff_copy(self):
+        for name in ("README.md","README.zh-CN.md"):
+            text=(release.ROOT/name).read_text()
+            for phrase in ("Control+C", "Command+C", "本轮", "作者账号", "sender's"):
+                self.assertNotIn(phrase,text,(name,phrase))
+            for required in ("python3 app.py --open", "PRIVACY.md", "docs/VERIFICATION.md", "LICENSE"):
+                self.assertIn(required,text,(name,required))
+        publication=(release.ROOT/"docs/PUBLISHING.md").read_text()
+        self.assertNotIn("本轮只准备",publication)
+        self.assertIn("prepare_github.py",publication)
+        self.assertIn("package_for_friends.py",publication)
 
     def test_public_source_scanner_uses_generic_paths_and_fake_secrets(self):
         for value in (("/"+"Users/"+"example-author/private").encode(),b"sk-"+b"x"*32,b"-----BEGIN PRIVATE KEY-----\nnot-real"):

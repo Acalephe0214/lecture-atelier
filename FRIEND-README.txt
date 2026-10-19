@@ -11,7 +11,7 @@ Lecture Atelier / 听课之间
    出现 [y/N] 后，确认信任来源、愿意下载，再输入 y 并按回车。
    首次约下载 0.5–1.5 GB，预留 2–4 GB；需 GitHub / PyPI / Hugging Face 可达。
    安装器在项目内准备 Python、PDF/音频依赖和多语言 Whisper small 模型。
-   不需要管理员权限、Codex、作者账号或 API key；不上传录音。
+   无需管理员权限，本地处理不需要 API key，也不上传录音。
 4. 成功后打开 http://127.0.0.1:8767/，保留服务终端；没自动打开就手动访问。
 5. 先用“探索虚构示例”，再用 30–60 秒的授权录音测试。
    新建课次 → 添加录音 → 选择录音语言 → 无稿时本地转写；有稿时直接导入。
@@ -20,10 +20,10 @@ Lecture Atelier / 听课之间
 以后怎么打开：
 Mac 双击 launch.command；Windows 双击 launch-windows.bat。
 服务还在、只关了网页：重新打开本地地址，不重复启动。
-停止：点击服务终端，按 Control+C。Mac 的 Command+C 只是复制。
+停止：点击服务终端，按 Control+C。
 重启电脑或停止服务后，再运行 launch，不必重新安装。
 
-新增两项：
+输出语言与视频处理：
 右侧“笔记输出语言”独立于界面/录音语言，可选中英法德越日或跟随原文；
 “语言设置”窗口显示对应默认提示词。只影响下次生成，不自动改旧笔记。
 MP4 / MOV / WEBM 本地转写先提取并缓存 16 kHz 单声道 WAV，之后再跑 Whisper；
@@ -59,7 +59,7 @@ start times and the old Timeline layout are available. Quick TXT is readable too
 SRT keeps sentence timing; JSON retains source rows and paragraph mappings.
 
 用量估算 / Usage planning:
-现在分别显示详细笔记与总览阶段。仅总览保留现有笔记；未经人工编辑、仍待核查的
+用量预估分为详细笔记与总览阶段。仅总览保留现有笔记；未经人工编辑、仍待核查的
 原句复制卡片只转成原文索引，避免重复发送正文。人工笔记与已核查笔记不这样处理。
 总览也会读取笔记未引用到的原文。首轮分组复用实际执行计划；后续综合依赖模型返回，
 因此用量仍只是区间，不是预算上限。全流程会重做详细笔记；预估不能预知其长度。
@@ -81,7 +81,7 @@ length is unknown. Estimates are not caps; blocked tasks are not zero-cost quote
 资料和密钥存在隐藏的 .runtime；不要删除或转发。
 外部索引文件仍在原路径，也要单独备份；停止服务后再备份使用目录。
 转发请用干净发行 ZIP，不是自己整个工作目录。
-本包不含作者的录音、课程、笔记、账号、密钥、模型权重或 Python 环境。
+发行包仅含源码、说明和示例；模型与运行环境由安装器另行下载。
 诊断下载可能含你的文本，分享前检查并脱敏。
 
 已知限制：

@@ -1,6 +1,6 @@
 # Set up Lecture Atelier — Mac / Windows
 
-## Current one-time automatic setup (2026-10-18)
+## Automatic setup
 
 This is a local first-run installer package, not an offline-first binary. The
 Mac .app is an unsigned launcher and MUST stay next to app.py in the extracted
@@ -32,7 +32,7 @@ folder. Do not disable Gatekeeper, remove quarantine or bypass PowerShell policy
    Windows 10/11 x64 is the provided target; Windows ARM64 is not packaged.
 8. Notion requires the RECIPIENT'S own connection token and shared parent page.
    Configure via Rates & Notion. Every export confirms the target and creates a
-   new child page; no automatic sync or page overwrites. Never copy sender keys.
+   new child page; no automatic sync or page overwrites. Keep connection tokens private.
 
 The remaining sections document the original basic/MLX manual path for users
 who already have that environment; they are NOT the only available ASR backend.
@@ -73,9 +73,8 @@ local preparation, not permission for new cloud uploads. Do not pack caches.
 
 ## Overview generation and failed requests
 
-“Generate overview only” keeps the existing detailed notes and synthesizes a
-separate overview; it does not skip the overview. A failed request never replaces
-existing notes or a saved overview. Calls are not automatically retried.
+“Generate overview only” synthesizes a separate overview from existing detailed
+notes. Failed requests preserve saved results and are not automatically retried.
 
 Overview synthesis groups at most 24 initial notes / 48,000 input characters,
 then merges the validated group summaries. The output target is concise; the
@@ -103,7 +102,7 @@ project context, not permission to bypass them.
 
 ## Outcome
 
-Get the basic local app running with English UI first. Then, only if requested,
+Get the basic local app running with the user's preferred UI language first. Then, only if requested,
 set up offline Whisper. No Codex subscription, API key, paid service, account,
 model download or package installation is required for the basic Python app.
 Using Codex as the installation assistant is optional.
@@ -114,8 +113,7 @@ Using Codex as the installation assistant is optional.
    If the user supplied only a ZIP, extract to a new user-approved directory,
    avoiding existing folders; do not write into another user's project.
 2. Check macOS and Apple Silicon versus Intel/Rosetta; find an installed Python
-   >=3.10. Python 3.12 is the tested baseline. Do not assume the sender's paths
-   exist or install Codex just to run this app.
+   >=3.10. Python 3.12 is the tested baseline. Verify local paths rather than reusing paths from another installation.
 3. Run `python3 check_setup.py --json` (substitute the actual supported Python).
    This command is read-only, performs no downloads and does not read keys.
 4. Report basic readiness and optional missing components. If Python is absent,
@@ -148,7 +146,7 @@ Verify `GET /api/health` returns `{ok:true}` and the English page appears. Use
 the English fictional demo or create a clearly labeled synthetic session to
 test import/edit/export without real private recordings. Do not reset a
 nonempty `.runtime` to obtain a clean demo. Report the URL and how to stop the
-actual retained terminal: Control+C, not Command+C. Closing a browser tab
+actual retained terminal: Control+C. Closing a browser tab
 does not stop the server. UI language uses the header selector, independently
 of recording language. Custom prompts and real lecture content stay original.
 
@@ -175,7 +173,7 @@ and `ffprobe -version`. If Homebrew is already installed, the user can approve
 page, rather than silently installing a package manager or untrusted binary.
 
 An explicit model download example (about 1.6 GB of weights, plus dependencies
-and working memory; not the sender's quantized model):
+and working memory):
 
 ```sh
 .venv/bin/python3 -c 'from huggingface_hub import snapshot_download; snapshot_download(repo_id="mlx-community/whisper-large-v3-turbo", local_dir="models/whisper-large-v3-turbo", allow_patterns=["config.json", "weights.safetensors"])'
