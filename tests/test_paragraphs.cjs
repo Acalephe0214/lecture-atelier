@@ -1,0 +1,18 @@
+const assert = require('node:assert/strict');
+const {group,separator} = require('../static/paragraphs.js');
+assert.equal(separator('He said “yes.”','“Next” follows.'),' ');
+assert.equal(separator('Il dit « oui. »','Puis'),' ');
+assert.equal(separator('Already spaced. ','Next'),'');
+const rows = Array.from({length:112}, (_,i) => ({id:`s${i}`,start:i*3,end:i*3+3,text:'这是合成的阅读测试片段，用来验证展示合并但不改动来源编号。'}));
+const before = JSON.stringify(rows);
+const groups = group(rows);
+assert.ok(groups.length < rows.length/3);
+assert.equal(JSON.stringify(groups.flat()), before);
+assert.equal(JSON.stringify(rows), before);
+const gap = {id:'gap',start:8,end:9,text:'非录音原文',asr_issue:true};
+assert.ok(group([rows[0],gap,rows[4]]).some(g => g.length===1 && g[0]===gap));
+assert.equal(group([{...rows[0],speaker:'a'},{...rows[1],speaker:'b'}]).length,2);
+assert.equal(group([rows[0],{...rows[1],start:100}]).length,2);
+assert.equal(separator('hello','world'),' ');
+assert.equal(separator('你好','世界'),'');
+console.log('11 paragraph checks passed');

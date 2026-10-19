@@ -1,0 +1,17 @@
+const assert = require('node:assert/strict');
+const {segmentAt, actionFor} = require('../static/playback.js');
+const rows = [{id:'a',start:0,end:null},{id:'b',start:240,end:null},{id:'c',start:300,end:null}];
+assert.equal(segmentAt(rows, 0).id, 'a');
+assert.equal(segmentAt(rows, 240).id, 'b');
+assert.equal(segmentAt(rows, 259.7).id, 'b');
+assert.equal(segmentAt(rows, 300).id, 'c');
+assert.equal(segmentAt([{id:'a',start:5,end:10}], 2), null);
+assert.equal(segmentAt([{id:'a',start:5,end:10}], 10), null);
+assert.equal(segmentAt([{id:'x',start:null,end:null}], 5), null);
+assert.equal(segmentAt(rows, NaN), null);
+assert.equal(actionFor('b','b',false,true), 'pause');
+assert.equal(actionFor('b','b',true,true), 'resume');
+assert.equal(actionFor('b','b',true,false), 'play');
+assert.equal(actionFor('a','b',false,true), 'play');
+assert.equal(actionFor('b',null,true,true), 'play');
+console.log('13 playback assertions passed; start-only intervals do not modify transcript ends.');

@@ -1,0 +1,3 @@
+# Python 3.10 or later. The application uses the standard library only.
+# No pip installation is required.
+

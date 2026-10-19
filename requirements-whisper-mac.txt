@@ -1,0 +1,4 @@
+# Optional only: Apple Silicon Mac + supported macOS + Python 3.12 recommended.
+# No model weights included. Install only if local speech recognition is needed.
+mlx-whisper==0.4.3
+huggingface-hub

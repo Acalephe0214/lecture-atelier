@@ -1,0 +1,12 @@
+#!/bin/zsh
+set -eu
+lecture_root="$(cd -- "$(dirname -- "$0")/../../.." && pwd)"
+if [ ! -f "$lecture_root/app.py" ]; then
+  /usr/bin/osascript -e 'display alert "Keep LectureAtelier.app together with the extracted project folder. / 请不要将 .app 单独移出解压后的文件夹。"'
+  exit 1
+fi
+if [ -f "$lecture_root/.portable/vendor/.requirements-sha256" ] && [ -f "$lecture_root/models/faster-whisper-small/model-manifest.json" ]; then
+  exec /usr/bin/open -a Terminal "$lecture_root/launch.command"
+else
+  exec /usr/bin/open -a Terminal "$lecture_root/setup-mac.command"
+fi

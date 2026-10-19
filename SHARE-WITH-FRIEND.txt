@@ -1,0 +1,32 @@
+可以直接转发给朋友：
+
+这是我做的 Lecture Atelier（听课之间），本地录音转写和笔记工具。
+1. 完整解压 ZIP，先打开 START-HERE.html，再按“完整中文手册”或
+   “Complete English manual”阅读。前四节是解压、安装、启动和第一段录音。
+2. Mac 双击 setup-mac.command；Windows 10/11 x64 双击 setup-windows.bat。
+3. 第一次输入 y 同意下载，程序会在项目内安装 Python、Whisper 和 PDF
+   依赖，再下载多语言模型。约 0.5–1.5 GB，留 2–4 GB 空间，需要能连接
+   GitHub / PyPI / Hugging Face。不上传录音，不需要管理员权限或 API key。
+4. 以后 Mac 双击 launch.command，Windows 双击 launch-windows.bat。
+   保留终端窗口；关闭程序按 Control+C，不是 Command+C。
+5. 转写是本地的；AI 校对/总结需要你自己的模型 API，Notion 也需你自己的
+   connection。每次发送文字前会单独确认。页面可切换 English / 中文。
+6. 安装不成功先看手册“故障排查”，不要删除 .runtime、关闭系统防护或
+   不停重跑付费请求。需要协助时给系统版本和已脱敏错误，别发密钥或录音。
+
+完整手册还包括：有稿/无稿两条路线、语言选择、回听与局部补转、降噪、
+API 根地址/模型 ID/密钥怎么填、AI 修订接受/拒绝、总览失败诊断、Word/PDF/
+字幕导出、Notion 授权、数据备份与升级。没有 API key 可先做本地处理。
+
+Mac 的 .app 是未签名启动器，不要单独移出文件夹。如果系统拦截，请先检查
+来源，不要关闭系统安全保护。Windows 脚本尚未经过 Windows 真机测试。
+首次下载模型失败仍可用基础编辑与 PDF；可重试安装。不承诺 small 模型的
+课堂专业术语识别准确率；结果须核对。
+
+If using Codex: open the extracted folder and ask it to read AGENTS.md and
+CODEX_SETUP.md. Ask it to install only project-local dependencies, verify the
+basic server and then test local Whisper with synthetic speech. No recording
+uploads, paid API calls, system-security changes or overwriting existing data.
+
+This is an automatic first-run installer, NOT a fully offline preloaded bundle.
+See THIRD-PARTY-NOTICES.txt for model/software licenses and sources.

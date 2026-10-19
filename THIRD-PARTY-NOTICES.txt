@@ -1,0 +1,58 @@
+Lecture Atelier — third-party software and model notices
+
+Project source: MIT, Copyright (c) 2026 Yanbo Qiao. See LICENSE.
+Third-party terms remain separate. Full copies and provenance for major optional
+components are in licenses/README.md and the neighboring LICENSE files.
+Source-release notice review: 2026-10-19. This is not a complete binary SBOM.
+
+First setup downloads dependencies into THIS project folder. It does not upload
+recordings, install a package manager, modify system Python, disable security,
+or call a paid service. A recipient must consent to the download. No API keys,
+the author's runtime, recordings or personal database are distributed.
+
+Whisper: MIT, Copyright (c) 2022 OpenAI.
+https://github.com/openai/whisper/blob/main/LICENSE
+The multilingual small weights are converted by SYSTRAN, model card declares MIT:
+https://huggingface.co/Systran/faster-whisper-small
+faster-whisper (SYSTRAN) and CTranslate2 (OpenNMT): MIT.
+https://github.com/SYSTRAN/faster-whisper/blob/master/LICENSE
+https://github.com/OpenNMT/CTranslate2/blob/master/LICENSE
+
+MIT License (OpenAI Whisper)
+Copyright (c) 2022 OpenAI
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Python is under the PSF license; portable Python includes its own licenses.
+https://docs.python.org/3/license.html
+https://github.com/astral-sh/python-build-standalone
+ReportLab is BSD-licensed. NumPy, tokenizers, Hugging Face Hub, ONNX Runtime
+and other wheels retain their own notices; installer collects installed wheel
+licenses in .portable/licenses/ and records package versions.
+
+PyAV bundles FFmpeg libraries; imageio-ffmpeg wheels include an FFmpeg executable.
+FFmpeg builds can have LGPL/GPL and codec-specific obligations. These binaries
+are downloaded by each recipient from PyPI, NOT redistributed in the source ZIP.
+https://github.com/PyAV-Org/PyAV
+https://github.com/imageio/imageio-ffmpeg
+https://ffmpeg.org/legal.html
+Do not assume that this notice alone permits arbitrary binary redistribution.
+An offline binary release needs a platform-specific license/source audit.
+
+System fonts are not copied into the package. PDF export may embed font glyph
+subsets from locally installed fonts. Interface code and models are separate.
+Model language support does not guarantee recognition accuracy. Windows x64
+bootstrap is supplied but has not been tested on a Windows machine by the author.

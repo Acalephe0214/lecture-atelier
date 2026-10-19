@@ -1,0 +1,60 @@
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const vm=require('node:vm');
+const path=require('node:path');
+const {choose,format,translator,diagnostics}=require('../static/i18n.js');
+const messages=require('../static/i18n-en.js');
+let checks=0;
+function check(fn){fn();checks++;}
+check(()=>assert.equal(choose('en','zh','zh-CN'),'en'));
+check(()=>assert.equal(choose('xx','en','zh-CN'),'en'));
+check(()=>assert.equal(choose(null,null,'zh-TW'),'zh'));
+check(()=>assert.equal(choose(null,null,'fr-FR'),'en'));
+check(()=>assert.equal(choose(null,null,'vi-VN'),'en'));
+const en=translator(messages,'en'),zh=translator(messages,'zh');
+check(()=>assert.equal(en.t('保存'),'Save'));
+check(()=>assert.equal(zh.t('保存'),'保存'));
+check(()=>assert.equal(en.t(undefined),''));
+check(()=>assert.equal(en.tt`${3} 个课次`,'3 sessions'));
+check(()=>assert.equal(zh.tt`${3} 个课次`,'3 个课次'));
+const privateTitle='保存 Chinese text $& {1} <script>not executable</script>';
+check(()=>assert.equal(en.tt`来源 ${'s1'} · ${'00:30'}\n原始转写：${privateTitle}`,`Source s1 · 00:30\nOriginal transcript: ${privateTitle}`));
+check(()=>assert.equal(format('{0} {1}', ['$&{1}','unchanged']),'$&{1} unchanged'));
+check(()=>assert.equal(en.t('未知的用户标题'),'未知的用户标题'));
+const source=fs.readFileSync(path.join(__dirname,'../static/app.js'),'utf8');
+const literalKeys=[...source.matchAll(/\bt\(("(?:\\.|[^"\\])*")/g)].map(match=>JSON.parse(match[1]));
+check(()=>assert.deepEqual([...new Set(literalKeys.filter(key=>!Object.hasOwn(messages,key)))],[]));
+check(()=>assert.ok(Object.keys(messages).length>500));
+check(()=>assert.ok(!/MutationObserver/.test(fs.readFileSync(path.join(__dirname,'../static/i18n.js'),'utf8'))));
+check(()=>assert.ok(source.includes('el("p", "", I18N.sourceText(segment))')));
+const diagnosticEn=diagnostics(messages,'en'),diagnosticZh=diagnostics(messages,'zh');
+check(()=>assert.equal(diagnosticEn.diagnostic('音频处理完毕：2664 段，50 处转写缺口。'),'Audio processing finished: 2664 segments, 50 transcription gaps.'));
+check(()=>assert.equal(diagnosticEn.diagnostic('s0042：尝试 2/4 · 前后各加 2 秒上下文'),'s0042: attempt 2/4 · Two seconds of context on each side'));
+check(()=>assert.match(diagnosticEn.diagnostic('有 50 个转写缺口：已有限重试，仍异常的输出未当作原文保存；请回听标记范围。处理进度 100% 不代表完整正确转写。'),/^There are 50 transcription gaps/));
+check(()=>assert.equal(diagnosticEn.diagnostic('第 3 批有未覆盖段落，已保留原文待核对。'),'Batch 3 contains uncovered passages. Their source text was retained for review.'));
+check(()=>assert.equal(diagnosticZh.diagnostic('音频处理完毕：2664 段，50 处转写缺口。'),'音频处理完毕：2664 段，50 处转写缺口。'));
+check(()=>assert.ok(!/\p{Script=Han}/u.test(diagnosticEn.diagnostic('其他后台诊断'))));
+check(()=>assert.equal(diagnosticEn.info('其他后台诊断').original,'其他后台诊断'));
+check(()=>assert.equal(diagnosticEn.diagnostic('HTTP 429: rate limited'),'HTTP 429: rate limited'));
+check(()=>assert.match(diagnosticEn.diagnostic('s$&{0}：尝试 4/4 · 原音＋词级时间码'),/^s\$&\{0\}: attempt 4\/4/));
+const gap={asr_issue:true,text:'【转写缺口，非录音原文】此处本地识别异常：模型文字置信偏低；模型时间码无效。请回听或另行补转；没有保留疑似循环输出。'};
+check(()=>assert.match(diagnosticEn.sourceText(gap),/^\[Transcription gap.*Low model text confidence; Invalid model timestamps/));
+check(()=>assert.equal(diagnosticZh.sourceText(gap),gap.text));
+check(()=>assert.match(diagnosticEn.diagnostic('模型笔记分 1 批处理，所有原文段落均已提交；来源编号仅经结构校验，不代表语义正确，仍需回听核查。'),/^Model notes were processed in 1 batches/));
+check(()=>assert.equal(diagnosticEn.sourceText({text:'模型文字置信偏低'}),'模型文字置信偏低'));
+check(()=>assert.equal(diagnosticEn.sourceText({text:gap.text}),gap.text));
+check(()=>assert.equal(diagnosticEn.sourceText({repair_method:'manual',text:'我手写的中文'}),'我手写的中文'));
+// Browser preference behavior when storage is unavailable: URL still wins,
+// and changing UI language keeps the current session hash without an API call.
+let replacement='';
+const window={LectureEnglish:messages,location:{href:'http://127.0.0.1:8767/?ui=en#lecture=old',replace:url=>replacement=url},
+  navigator:{language:'zh-CN'},localStorage:{getItem(){throw Error('blocked')},setItem(){throw Error('blocked')}},
+  NodeFilter:{SHOW_TEXT:4},document:{documentElement:{},body:{},createTreeWalker:()=>({nextNode:()=>null}),querySelectorAll:()=>[],getElementById:()=>null}};
+vm.runInNewContext(fs.readFileSync(path.join(__dirname,'../static/i18n.js'),'utf8'),{window,URL});
+check(()=>assert.equal(window.LectureI18n.language,'en'));
+check(()=>assert.equal(window.document.documentElement.lang,'en'));
+window.LectureI18n.switchTo('zh','a-session');
+check(()=>assert.equal(replacement,'http://127.0.0.1:8767/?ui=zh#lecture=a-session'));
+check(()=>assert.equal(window.LectureI18n.diagnostic('请先在设置中选择已下载的 MLX Whisper 模型目录。'),'Choose a downloaded MLX Whisper model directory in Settings first.'));
+check(()=>assert.match(window.LectureI18n.diagnostic('其他后台诊断'),/^A system error or warning/));
+console.log(`${checks} interface-language checks passed`);
