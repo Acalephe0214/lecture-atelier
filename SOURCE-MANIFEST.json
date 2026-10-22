@@ -11,8 +11,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "c2b44d593c04a29acaefb571c88fac2378d13c5e9051b6cca6b0dae9771938f4",
-      "bytes": 1985
+      "sha256": "0d359c2cf55007f2bd90ce306bcb4473b9ad50f80ce4b23b7990913e9d357e54",
+      "bytes": 2115
     },
     {
       "path": "app.py",
@@ -506,8 +506,8 @@
     },
     {
       "path": ".github/workflows/checks.yml",
-      "sha256": "3c2f4f41dadef6b5d0b0f9939d6ac8d9e7fb80e3b00dad03c332a3e98a80edf2",
-      "bytes": 1669
+      "sha256": "a02f29058a7a137be8e040cd8d460be3623e301388af31d987a54f32d3297ea8",
+      "bytes": 1771
     },
     {
       "path": ".github/ISSUE_TEMPLATE/bug.yml",

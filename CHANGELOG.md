@@ -9,6 +9,7 @@
 - Add confirmed course/session/audio removal, a recoverable local recycle bin and active-job/conflict guards. Original media files remain on disk.
 - Add synthetic recovery, removal and bilingual interface regressions; retain documented real-world validation limits.
 - Refresh English/Chinese repository previews and setup navigation; add an output-quality feedback form and version-specific user-package links.
+- Refresh official CI actions for their supported Node 24 runtime; disable persisted checkout credentials and unused npm caching.
 
 ## 0.1.0-alpha.1 — 2026-10-19
 
