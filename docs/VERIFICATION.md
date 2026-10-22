@@ -10,6 +10,11 @@ Some integration checks run a loopback simulated SSE model. They exercise the ap
 
 Local development has also included an English synthetic-speech smoke test with an existing Whisper model and a checkpoint rerun. That demonstrates one setup path, not multilingual accuracy. Browser checks performed during development do not establish Windows compatibility. Clean end-user Windows setup, broad language combinations, noise-reduction quality and summary quality remain unvalidated.
 
+## Recorded validation — 2026-10-22
+
+- [Alpha.2 application CI at 96f90c3](https://github.com/Acalephe0214/lecture-atelier/actions/runs/39255234899): Linux, macOS and Windows jobs passed. These are software and hosted-runner setup checks, not independent end-user installation trials.
+- Repository presentation and release checks: 350 local Python tests and 233 buildless JavaScript assertions/checks passed. Updated public screenshots use a fresh fictional demo workspace with no model calls. English and Chinese READMEs were rendered with GitHub's Markdown API and inspected at desktop and mobile widths, including expandable configuration and map sections.
+
 ## Recorded validation — 2026-10-19
 
 - Alpha.2 local software regression: 349 Python tests and 233 buildless JavaScript assertions/checks passed using synthetic fixtures/mocked services. Recovery tests include a failed third detail batch, a failed final overview merge, restart reuse, invalid/corrupted citations, usage accounting and protection of manual edits.

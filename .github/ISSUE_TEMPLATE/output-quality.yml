@@ -1,0 +1,59 @@
+name: Output quality / 输出质量
+description: Missing text, wrong citations, invented conclusions or repeated costly failures.
+body:
+  - type: markdown
+    attributes:
+      value: "Use a short fictional example. Keep recordings, real transcripts, provider responses, keys and .runtime private. / 请用简短虚构例子，保留私人录音、文稿、接口返回、密钥和运行目录。"
+  - type: input
+    id: version
+    attributes:
+      label: App version / 版本
+      placeholder: 0.1.0-alpha.2
+    validations:
+      required: true
+  - type: dropdown
+    id: stage
+    attributes:
+      label: Affected stage / 出问题的步骤
+      options:
+        - Local transcription / 本地转写
+        - AI proofreading / AI 校对
+        - Notes or overview / 笔记或总览
+        - Sources or decisions / 出处或决策
+        - Checkpoint recovery or usage / 断点续跑或用量
+        - Export / 导出
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS, language and model ID / 系统、语言、模型 ID
+      description: Model name only. Keep keys, private endpoint URLs and file paths private.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Fictional reproduction / 虚构例子与步骤
+      description: A few invented sentences and the selected mode are enough. Describe audio problems in words rather than attaching a recording.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual result / 期望与实际结果
+      description: Identify the omitted point, incorrect source or unsupported conclusion using the fictional example.
+    validations:
+      required: true
+  - type: textarea
+    id: recovery
+    attributes:
+      label: Recovery and reported usage / 恢复情况与已报告用量
+      description: Optional. Did Continue from checkpoints reuse completed batches? Include numeric counts or a redacted error, not the full diagnostic file.
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check / 隐私检查
+      options:
+        - label: This report uses fictional material and excludes credentials, private transcripts and recordings.
+          required: true

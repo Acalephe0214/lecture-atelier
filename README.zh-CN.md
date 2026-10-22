@@ -1,18 +1,25 @@
 # 听课之间 · Lecture Atelier
 
-把课程、讲座或会议的**录音／文字稿，变成可回听、可修改、可导出的文稿与笔记**。在自己的电脑上运行，通过浏览器使用。
+把课程、讲座或会议的**录音，变成可回听校对的文稿与带出处的笔记**。在自己的电脑上完成回听、修改、整理和导出。
 
-[English](README.md) · [下载](https://github.com/Acalephe0214/lecture-atelier/releases) · [开始使用](#start) · [完整流程](#workflow) · [通义听悟怎么用](#tingwu)
+[下载 alpha.2](https://github.com/Acalephe0214/lecture-atelier/releases/tag/v0.1.0-alpha.2) · [English](README.md) · [开始使用](#start) · [完整流程](#workflow) · [通义听悟怎么用](#tingwu) · [反馈](#feedback)
+
+[![软件检查](https://github.com/Acalephe0214/lecture-atelier/actions/workflows/checks.yml/badge.svg?branch=codex%2Finitial-publication)](https://github.com/Acalephe0214/lecture-atelier/actions/workflows/checks.yml) · [MIT 许可证](LICENSE) · **Alpha 测试版** · macOS / Windows x64 启动器
 
 ## 输入什么？输出什么？能做什么？
 
-- **输入：** 一份录音或视频，或者已有的 TXT、SRT、VTT、受支持的 JSON 转写稿。也可以同时提供录音和文字稿。
-- **输出：** 可编辑的转写稿；可选 AI 校对建议、详细笔记和总结总览；可下载的 Word、PDF、Markdown、TXT、JSON 或字幕文件，具体格式取决于导出内容。
-- **功能：** 音视频转文字 → 边听边改 → 审阅 AI 修改 → 按课程／讨论／会议整理 → 回查出处 → 导出文件或发送到 Notion。各步骤可以单独使用，不必全部开启。
+- **输入：** 音频／视频，或已有的 TXT、SRT、VTT、受支持的 JSON 转写稿。同时添加录音和带时间码的稿，可定位回听。
+- **输出：** 可编辑文稿、可选的 AI 修订与笔记，以及 Word、PDF、Markdown 等文件；也可导出 Notion 页面。
+- **功能：** 得到文字稿 → 边听边改 → AI 整理 → 回查出处 → 导出。可以用本地 Whisper，也可以导入听悟等服务生成的稿子。
 
-**不配置 AI 也能用。** 导入、手工修改和非 PDF 本地导出不需要 API。只有本地识别需要安装语音组件；AI 校对和总结需要配置模型接口。
+**先体验，再配置：** 启动后点「探索虚构示例」，无需 API key，就能试阅读、修改、保存和导出；需要转写或 AI 笔记时再安装组件、配置模型。
 
 ## 要填什么，才能使用？
+
+**手工校对**只需文字稿；**本地识别**需要安装 `speech`；**AI 笔记**需要 API 地址、准确的模型 ID 和密钥。
+
+<details>
+<summary>展开各项功能的配置清单</summary>
 
 | 想做的事 | 需要提供或配置什么 |
 | --- | --- |
@@ -22,17 +29,35 @@
 | AI 校对、生成总览和笔记 | 在「设置与术语表 → LLM」填写服务商提供的 **API 地址、准确的模型 ID、API key**。不是品牌名称或网页登录密码。 |
 | 发送笔记到 Notion（可选） | 填写 **Notion connection token、目标父页面链接／ID**，并在 Notion 授权该 connection 访问父页面。这与模型 API key 是两套配置。 |
 
-**想先看看效果？** 启动后点「探索虚构示例」，不需要准备账号、密钥或自己的录音，就能试阅读、修改和导出。运行应用需要 Python，安装方法见下方。
+</details>
 
-右上角「流程地图」可查看五个步骤、对应按钮和每步产物。左侧「管理课程」、中间「课次选项 → 移除课次」及「移除录音」会把选中记录移入本地「回收站」，可以恢复。移除录音关联时，文字稿、笔记及原文件保留。
+<a id="preview"></a>
 
-![虚构材料演示：原文与结构化笔记](docs/images/workspace.png)
+## 看看界面
+
+[![虚构材料演示：文稿校对与笔记工作台](docs/images/workspace.png)](docs/images/workspace.png)
+
+*新版界面使用虚构示例。截图里的原句卡片用于体验操作，并非模型生成的总结。*
+
+- **边听边改：** 时间码定位、段落阅读、手工编辑，以及可逐项接受／拒绝的 AI 修订。
+- **按用途整理：** 课程、讲座、讨论和会议模式，生成总览与详细笔记，并关联原文出处。
+- **中断后继续：** 成功批次保存断点，已完成笔记保留草稿，token 按本次新请求统计。
+- **保留或带走：** 本地保存、移除后可恢复、多种文档导出，以及可选的 Notion 单向导出。
+
+<details>
+<summary>看看五步流程地图</summary>
+
+![听课之间的五步流程地图](docs/images/journey-map.png)
+
+点右上角「流程地图」，选择一站，查看该点哪里、会得到什么，再跳转到对应操作。课程、课次和录音关联可移入「回收站」并恢复；原始音视频文件保留。
+
+</details>
 
 <a id="start"></a>
 
 ## 第一次启动
 
-1. 在 [Releases](https://github.com/Acalephe0214/lecture-atelier/releases) 下载 **`LectureAtelier-<版本号>.zip`** 并完整解压。这是使用包，首次使用不必选开发者源码包。
+1. 下载 **[LectureAtelier-0.1.0-alpha.2.zip](https://github.com/Acalephe0214/lecture-atelier/releases/download/v0.1.0-alpha.2/LectureAtelier-0.1.0-alpha.2.zip)** 并完整解压。首次使用选这个使用包，便于按引导安装；GitHub 自动生成的 Source code 是源码下载入口。
 2. **Mac：** 打开 `LectureAtelier.app` 或 `launch.command`。**Windows 10/11 x64：** 打开 `launch-windows.bat`。
 3. 浏览器打开 <http://127.0.0.1:8767/>。右上角可选中文或 English。点「探索虚构示例」，试着改一句原文、保存、刷新，再导出 TXT。示例不是模型质量评测。
 
@@ -44,6 +69,9 @@ python3 app.py --open
 
 Windows 命令行可用 `py -3 app.py --open`。缺少 Python 时，启动器会引导确认下载项目本地运行环境；**基础模式不下载 Whisper 模型**。这是源码式本地应用，不是已签名、所有依赖都预装好的原生安装包。
 
+<details>
+<summary>可选安装组件与下载量</summary>
+
 需要更多功能时，Mac 打开 `setup-mac.command`，Windows 打开 `setup-windows.bat`：
 
 | 安装选项 | 用途 |
@@ -54,6 +82,8 @@ Windows 命令行可用 `py -3 app.py --open`。缺少 Python 时，启动器会
 | `full` | 本地转写和 PDF。 |
 
 语音安装可能需下载约 0.5–1.5 GB、预留 2–4 GB 磁盘；已有语音配置会保留。详细安装说明：[中文手册](FRIEND-GUIDE.html) · [English guide](FRIEND-GUIDE-EN.html)。
+
+</details>
 
 <a id="workflow"></a>
 
@@ -141,9 +171,27 @@ Windows 命令行可用 `py -3 app.py --open`。缺少 Python 时，启动器会
 
 ### 让浏览器助手协助
 
+<details>
+<summary>可选的浏览器操作交接</summary>
+
 在交接窗口点「复制给浏览器 AI」，把说明交给**确实有浏览器和本地文件上传能力、且你信任的助手**。说明含录音路径和返回课次地址；没有相应能力的聊天模型不能代替你操作网页。
 
 App 不会自行启动助手、登录或上传。你仍需完成账号验证并确认外发；额度不足或出现新增费用时停下确认，不自动购买。说明含私人路径，不要贴到公开仓库或 Issue。下载完成后仍按上面第 6—7 步导回检查。
+
+</details>
+
+<a id="feedback"></a>
+
+## 一起改进这个工具
+
+按遇到的问题选择反馈入口：
+
+- [安装问题](https://github.com/Acalephe0214/lecture-atelier/issues/new?template=installation.yml)：启动器、运行环境或可选组件安装。
+- [功能报错](https://github.com/Acalephe0214/lecture-atelier/issues/new?template=bug.yml)：可以复现的界面或工作流问题。
+- [输出质量](https://github.com/Acalephe0214/lecture-atelier/issues/new?template=output-quality.yml)：转写遗漏、引用错误、虚构决策，或反复调用仍失败。
+- [功能建议](https://github.com/Acalephe0214/lecture-atelier/issues/new?template=feature.yml)：你要完成什么任务、目前卡在哪里。
+
+提供版本、系统和第一个出错步骤，用简短虚构例子复现，截图先脱敏。录音、真实转写、密钥和 `.runtime/` 留在本机。愿意独立试用的朋友，可以按[首次试用清单](docs/TRY-IT.md)记录过程。
 
 ## 数据、限制和更多说明
 

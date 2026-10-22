@@ -10,10 +10,10 @@ from package_for_friends import FILES as APP_FILES, check_public_content
 
 ROOT = Path(__file__).resolve().parent
 PUBLIC_DOCS = ("README.md", "README.zh-CN.md", "PRIVACY.md", "SECURITY.md", "requirements-dev.txt", ".gitattributes",
-    "docs/ARCHITECTURE.md", "docs/VERIFICATION.md", "docs/EVALUATION.md", "docs/ROADMAP.md", "docs/PUBLISHING.md", "docs/TRY-IT.md", "docs/images/workspace.png",
+    "docs/ARCHITECTURE.md", "docs/VERIFICATION.md", "docs/EVALUATION.md", "docs/ROADMAP.md", "docs/PUBLISHING.md", "docs/TRY-IT.md", "docs/images/workspace.png", "docs/images/journey-map.png",
     "evaluate_transcripts.py",
     ".github/workflows/checks.yml", ".github/ISSUE_TEMPLATE/bug.yml", ".github/ISSUE_TEMPLATE/installation.yml",
-    ".github/ISSUE_TEMPLATE/feature.yml", ".github/ISSUE_TEMPLATE/config.yml",
+    ".github/ISSUE_TEMPLATE/feature.yml", ".github/ISSUE_TEMPLATE/config.yml", ".github/ISSUE_TEMPLATE/output-quality.yml",
     "examples/import_demo.srt", "examples/untimed_demo.txt")
 PUBLIC_TESTS = (
     "tests/test_acceptance.py", "tests/test_asr_guard.py", "tests/test_audio_processing.py", "tests/test_clean_workspace.py",

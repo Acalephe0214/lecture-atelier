@@ -88,7 +88,7 @@ class SourceReleaseTests(unittest.TestCase):
         }
         for name, phrases in required.items():
             text = (release.ROOT/name).read_text()
-            before_screenshot = text.split("![", 1)[0]
+            before_screenshot = text.split("docs/images/workspace.png", 1)[0]
             for phrase in phrases:
                 self.assertIn(phrase, before_screenshot, (name, phrase))
             for value in ("API", "model" if name == "README.md" else "模型 ID", "Notion", "speech", "SRT", "TXT"):
@@ -99,3 +99,20 @@ class SourceReleaseTests(unittest.TestCase):
             self.assertIn("https://help.aliyun.com/zh/tingwu/product-introduction/", text)
             for anchor in ("start", "workflow", "tingwu"):
                 self.assertIn('id="'+anchor+'"', text)
+
+    def test_readmes_expose_current_download_feedback_and_bilingual_previews(self):
+        version = (release.ROOT/"VERSION").read_text().strip()
+        for name in ("README.md", "README.zh-CN.md"):
+            text = (release.ROOT/name).read_text()
+            self.assertIn("/releases/download/v"+version+"/LectureAtelier-"+version+".zip", text)
+            self.assertIn("docs/images/workspace.png", text)
+            self.assertIn("docs/images/journey-map.png", text)
+            self.assertIn('id="feedback"', text)
+            self.assertEqual(text.count("<details>"), text.count("</details>"))
+            for form in ("bug.yml", "installation.yml", "feature.yml", "output-quality.yml"):
+                self.assertIn("template="+form, text)
+                self.assertIn(".github/ISSUE_TEMPLATE/"+form, release.SOURCE_FILES)
+        quality=(release.ROOT/".github/ISSUE_TEMPLATE/output-quality.yml").read_text()
+        self.assertIn("fictional", quality)
+        self.assertIn("private", quality)
+        self.assertIn("Checkpoint recovery", quality)

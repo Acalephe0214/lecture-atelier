@@ -1,18 +1,25 @@
 # Lecture Atelier · 听课之间
 
-Turn lecture, talk or meeting **recordings/transcripts into editable documents and source-linked notes**. Runs on your computer; use it through a browser.
+Turn lecture, talk or meeting **recordings into reviewable transcripts and source-linked notes**. A local workspace for listening, editing, organizing and exporting.
 
-[中文说明](README.zh-CN.md) · [Downloads](https://github.com/Acalephe0214/lecture-atelier/releases) · [Start here](#start) · [Full workflow](#workflow) · [Using Tingwu](#tingwu)
+[Download alpha.2](https://github.com/Acalephe0214/lecture-atelier/releases/tag/v0.1.0-alpha.2) · [中文说明](README.zh-CN.md) · [Start here](#start) · [Full workflow](#workflow) · [Using Tingwu](#tingwu) · [Feedback](#feedback)
+
+[![Software checks](https://github.com/Acalephe0214/lecture-atelier/actions/workflows/checks.yml/badge.svg?branch=codex%2Finitial-publication)](https://github.com/Acalephe0214/lecture-atelier/actions/workflows/checks.yml) · [MIT license](LICENSE) · **Alpha** · macOS / Windows x64 launchers
 
 ## What goes in? What comes out?
 
-- **Input:** an audio/video recording, or an existing TXT, SRT, VTT or supported JSON transcript. You can provide both the recording and its transcript.
-- **Output:** an editable transcript; optional AI correction suggestions, detailed notes and an executive overview; downloadable Word, PDF, Markdown, TXT, JSON or subtitle files, depending on what you export.
-- **What it does:** transcribe → listen and edit → review AI corrections → organize by lecture/discussion/meeting → check sources → export files or send notes to Notion. Each step can be used separately.
+- **Input:** audio/video, or a TXT, SRT, VTT or supported JSON transcript. Add both for timed playback.
+- **Output:** an editable transcript, optional AI revisions and notes, and files such as Word, PDF or Markdown; optional Notion pages.
+- **What it does:** get a transcript → listen and edit → organize with AI → check sources → export. Use local Whisper or import a transcript from Tingwu or another service.
 
-**An AI account is not required for basic use.** Importing, manual editing and non-PDF local exports need no API. Local recognition needs speech components; AI proofreading and notes need a configured model endpoint.
+**Try it with no API key:** start the app and choose **Explore fictional demo**. Read, edit, save and export before installing speech components or configuring a model.
 
 ## What do I need to provide?
+
+For **manual review**, bring a transcript. For **local recognition**, install `speech`. For **AI notes**, provide an API base URL, exact model ID and key.
+
+<details>
+<summary>Configuration checklist for each feature</summary>
 
 | What you want to do | Required input or configuration |
 | --- | --- |
@@ -22,17 +29,35 @@ Turn lecture, talk or meeting **recordings/transcripts into editable documents a
 | AI corrections, overview and notes | In **Settings & glossary → LLM**, enter your provider's **API base URL, exact model ID and API key**. A brand name or website password is not a model ID/key. |
 | Send notes to Notion (optional) | A **Notion connection token and parent page link/ID**; grant that connection access to the parent page in Notion. This is separate from the model API key. |
 
-**Just looking around?** Start the app and choose **Explore fictional demo** to read, edit and export without accounts, keys or your own recording. Running the app requires Python; see setup below.
+</details>
 
-The upper-right **Journey map** shows five clickable steps, the relevant controls and each step's output. **Manage courses**, **Session options → Remove session**, and **Remove audio** move selected records to the local **Recycle bin**, where they can be restored. Removing an audio link retains the transcript, notes and original file.
+<a id="preview"></a>
 
-![Fictional transcript and notes in Lecture Atelier](docs/images/workspace.png)
+## See the workspace
+
+[![Fictional transcript review and notes workspace](docs/images/workspace.png)](docs/images/workspace.png)
+
+*Current interface with fictional demo material. The example's source-copy cards are for exploring the workflow, not model-generated summaries.*
+
+- **Listen and revise:** timed source links, paragraph reading, manual edits and AI changes you can accept or reject.
+- **Organize by purpose:** class, talk, discussion and meeting modes; overview, detailed notes and traceable source references.
+- **Resume interrupted work:** saved AI batches, completed-note drafts and provider-reported tokens for new requests.
+- **Keep or take away:** local session storage, recoverable removal, document exports and optional one-way Notion delivery.
+
+<details>
+<summary>Explore the five-step Journey map</summary>
+
+![Five-step journey map inside Lecture Atelier](docs/images/journey-map.png)
+
+Open **Journey map** in the upper-right corner. Select a stop to see the relevant control and its output, then jump to that part of the app. Courses, sessions and audio links can be moved to the **Recycle bin** and restored; original media files remain on disk.
+
+</details>
 
 <a id="start"></a>
 
 ## First start
 
-1. Download **`LectureAtelier-<version>.zip`** from [Releases](https://github.com/Acalephe0214/lecture-atelier/releases) and extract the entire folder. This is the user package; a first trial does not need the developer source archive.
+1. Download **[LectureAtelier-0.1.0-alpha.2.zip](https://github.com/Acalephe0214/lecture-atelier/releases/download/v0.1.0-alpha.2/LectureAtelier-0.1.0-alpha.2.zip)** and extract the entire folder. Choose the user package, rather than GitHub's automatic source archives, for the guided setup.
 2. **Mac:** open `LectureAtelier.app` or `launch.command`. **Windows 10/11 x64:** open `launch-windows.bat`.
 3. Open <http://127.0.0.1:8767/>. Choose English or Chinese in the upper-right corner, then **Explore fictional demo**. Edit a sentence, save, refresh and export TXT. The demo is not a model-quality benchmark.
 
@@ -44,6 +69,9 @@ python3 app.py --open
 
 Windows CLI: `py -3 app.py --open`. If Python is missing, the launcher guides you through a confirmed project-local runtime download. **Basic mode downloads no Whisper model.** This is a source-based local app, not a signed native installer with all dependencies preinstalled.
 
+<details>
+<summary>Optional setup profiles and download sizes</summary>
+
 For optional components, open `setup-mac.command` on Mac or `setup-windows.bat` on Windows:
 
 | Setup option | Purpose |
@@ -54,6 +82,8 @@ For optional components, open `setup-mac.command` on Mac or `setup-windows.bat` 
 | `full` | Both local transcription and PDF. |
 
 Speech setup may need 0.5–1.5 GB downloads and 2–4 GB disk; existing speech settings are retained. Detailed setup: [English guide](FRIEND-GUIDE-EN.html) · [Chinese guide](FRIEND-GUIDE.html).
+
+</details>
 
 <a id="workflow"></a>
 
@@ -141,9 +171,27 @@ You can also use Tingwu independently, then create a session here, add the same 
 
 ### Ask a browser-capable assistant to help
 
+<details>
+<summary>Optional browser handoff instructions</summary>
+
 Choose **Copy for a browser assistant** in the handoff window and give it to a trusted assistant with actual browser and local-file-upload capabilities. Instructions include the recording path and return-session URL. A text-only chatbot cannot perform those browser actions.
 
 The app does not launch an assistant, sign in or upload automatically. You still handle verification and upload consent. Stop for confirmation if credits are insufficient or new charges appear; no automatic purchase. Instructions contain private paths: do not post them in public repositories or issues. After download, complete steps 6–7 above.
+
+</details>
+
+<a id="feedback"></a>
+
+## Help improve the app
+
+Choose the report that matches your experience:
+
+- [Installation help](https://github.com/Acalephe0214/lecture-atelier/issues/new?template=installation.yml) — launcher, runtime or optional-component setup.
+- [Report a bug](https://github.com/Acalephe0214/lecture-atelier/issues/new?template=bug.yml) — a reproducible UI or workflow failure.
+- [Report output quality](https://github.com/Acalephe0214/lecture-atelier/issues/new?template=output-quality.yml) — missing text, wrong citations, invented decisions or repeated costly failures.
+- [Suggest a feature](https://github.com/Acalephe0214/lecture-atelier/issues/new?template=feature.yml) — the task you want to complete and what gets in the way.
+
+Include the app version, platform and first failing step. Use a small fictional example and redact screenshots; keep recordings, real transcripts, keys and `.runtime/` private. For an independent first trial, follow the [short checklist](docs/TRY-IT.md).
 
 ## Data, limits and further reading
 
@@ -162,6 +210,7 @@ node tests/test_i18n.cjs
 node tests/test_paragraphs.cjs
 node tests/test_playback.cjs
 node tests/test_panels.cjs
+node tests/test_journey.cjs
 ```
 
 Tests use temporary synthetic workspaces; some media checks need FFmpeg. See [verification](docs/VERIFICATION.md) for optional test dependencies and evaluation limits.
